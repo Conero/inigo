@@ -10,8 +10,8 @@ import "fmt"
 type Tester struct {
 }
 
-func (t *Tester) LinerTest()  {
+func (t *Tester) LinerTest() {
 	liner := Liner{}
 	// 当行多列测试
-	fmt.Println(liner.singleObject("{ key = { key2 ={ key3 = { key4 = { key5 = { key6 = value6 }}}}}}"))
-} 
+	fmt.Println(liner.singleObject("{ key = { key2 ={ key3 = { key4 = { key5 = { key6 = value6 是一个复杂的字符串\\{key\\= value\\} }}}}}}"))
+}

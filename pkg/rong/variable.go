@@ -17,8 +17,8 @@ const (
 
 // ini-parse 设置
 var IniParseSettings map[string]string = map[string]string{
-	"equal":   "=",   // 等号符
-	"reg_comment": "^[#;]", // 注释符号
-	"reg_section": "^\\[[^\\[^\\]}]*\\]$", // 是否为章节正则检测
-	"reg_section_sg": "(\\[)|(\\])",		// 章节标点符号处理
+	"equal":          "=",                    // 等号符
+	"reg_comment":    "^[#;]",                // 注释符号
+	"reg_section":    "^\\[[^\\[^\\]}]*\\]$", // 是否为章节正则检测
+	"reg_section_sg": "(\\[)|(\\])",          // 章节标点符号处理
 }

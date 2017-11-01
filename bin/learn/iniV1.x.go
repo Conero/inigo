@@ -1,17 +1,18 @@
 package main
 
 import (
-	"fmt"
 	. "../../pkg/ini"
+	"fmt"
 )
 
 type IniTest struct {
 }
-func (it *IniTest) Console(){
+
+func (it *IniTest) Console() {
 	it.linerTest()
 }
 
-func (it *IniTest) linerTest(){
+func (it *IniTest) linerTest() {
 	line := &Tester{}
 	//fmt.Println(line)
 	line.LinerTest()

@@ -10,9 +10,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 )
 
 // ini 结构体
@@ -52,22 +52,25 @@ func (I *Ini) reader() {
 		}
 	}
 }
+
 //是否为注释行
 func (I *Ini) isComment(line string) bool {
-	matched , _ := regexp.MatchString(IniParseSettings["reg_comment"], line)
+	matched, _ := regexp.MatchString(IniParseSettings["reg_comment"], line)
 	return matched
 }
+
 // 章节处理
-func (I *Ini) isSection(line string) (bool, string)  {
+func (I *Ini) isSection(line string) (bool, string) {
 	reg := regexp.MustCompile(IniParseSettings["reg_section"])
 	matched := reg.MatchString(line)
 	value := ""
-	if matched{
+	if matched {
 		regSg := regexp.MustCompile(IniParseSettings["reg_section_sg"])
 		value = regSg.ReplaceAllString(line, "")
 	}
 	return matched, value
 }
+
 // 解析文件
 func (I *Ini) parseFile(fs *os.File) {
 	// 节
@@ -84,32 +87,32 @@ func (I *Ini) parseFile(fs *os.File) {
 		line = strings.TrimSpace(line)
 		I.File.countLine()
 		// 空行
-		if !isPanicError && len(line) == 0{
+		if !isPanicError && len(line) == 0 {
 			continue
 		}
 		// 注释行
-		if !isPanicError && I.isComment(line){
+		if !isPanicError && I.isComment(line) {
 			continue
 		}
 		// 章节判断
 		isSct, sctKey := I.isSection(line)
-		if isSct{
+		if isSct {
 			section = sctKey
 			I.DataQueue[section] = map[string]interface{}{}
 			continue
 		}
 		// 值处理
 		equlIdx := strings.Index(line, IniParseSettings["equal"])
-		if equlIdx > -1{
+		if equlIdx > -1 {
 			key := strings.TrimSpace(line[0:equlIdx])
 			value := strings.TrimSpace(line[equlIdx+1:])
-			if section == ""{
+			if section == "" {
 				I.DataQueue[key] = value
-			}else {
+			} else {
 				sectionValue, has := I.DataQueue[section]
 				sV := map[string]interface{}{}
 				// 与历史值合并
-				if has{
+				if has {
 					sV = sectionValue.(map[string]interface{})
 				}
 				sV[key] = value
@@ -141,15 +144,16 @@ func getStrByDQ(key string, dq map[string]interface{}) string {
 	}
 	return value
 }
+
 // 读取函数为字符串
 // key 支持.二级操作
 func (I *Ini) GetString(key string) string {
 	value := ""
 	pntIdx := strings.Index(key, ".")
-	if pntIdx > -1{
+	if pntIdx > -1 {
 		fKey := key[0:pntIdx]
 		mpDq, has := I.DataQueue[fKey]
-		if has{
+		if has {
 			switch mpDq.(type) {
 			case map[string]interface{}:
 				sKey := key[pntIdx+1:]
@@ -157,7 +161,7 @@ func (I *Ini) GetString(key string) string {
 			}
 		}
 
-	}else{
+	} else {
 		value = getStrByDQ(key, I.DataQueue)
 	}
 

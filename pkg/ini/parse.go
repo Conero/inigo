@@ -16,7 +16,7 @@ import (
 
 // ini 结构体
 type Ini struct {
-	Liner							 // 组合继承- 行处理
+	Liner                            // 组合继承- 行处理
 	FileName  string                 // ini 文件
 	DataQueue map[string]interface{} // ini 解析后的数据
 	IsSuccess bool                   // ini 文件是否解析成功
@@ -68,18 +68,32 @@ func (I *Ini) parseFile(fs *os.File) {
 		line = strings.TrimSpace(line)
 		I.File.countLine()
 		// 非错误
-		if !isPanicError{
+		if !isPanicError {
 			// 空行
+			if len(line) == 0 {
+				continue
+			}
+			// 多行注释
+			if I.isMultiComment(line) {
+				continue
+			}
 			// 单行注释
-			if len(line) == 0 || I.isComment(line){
+			if I.isComment(line) {
+				continue
+			}
+			// 键值结束
+			if line == IniParseSettings["scope2"] {
+				bba.CommitQueue()
 				continue
 			}
 			// 获取基键
-			isBK,BK, nLine := I.getBaseKey(line)
-			if isBK{	// 是基键
+			isBK, BK, nLine := I.getBaseKey(line)
+			if isBK { // 是基键
 				bba.UpdateBaseKey(BK)
 				continue
-			}else if BK != ""{}
+			} else if BK != "" {
+				bba.PushQueue(BK, nLine)
+			}
 			fmt.Println(isBK, BK, nLine)
 		}
 		//fmt.Println(I.strTransform(line))
@@ -117,4 +131,9 @@ func (I *Ini) GetString(key string) string {
 func (I *Ini) HasKey(key string) bool {
 	_, exist := I.DataQueue[key]
 	return exist
+}
+
+// 转化为json字符串
+func (I *Ini) ToJsonString() string {
+	return ToJsonStr(I.DataQueue)
 }
