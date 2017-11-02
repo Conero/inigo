@@ -92,9 +92,12 @@ func (I *Ini) parseFile(fs *os.File) {
 				bba.UpdateBaseKey(BK)
 				continue
 			} else if BK != "" {
-				bba.PushQueue(BK, nLine)
+				//bba.PushQueue(BK, nLine)
+				bba.PushQueue(BK, I.strToData(nLine))
+			} else {
+				bba.MiltiLineToArray(nLine)
 			}
-			fmt.Println(isBK, BK, nLine)
+			fmt.Println(isBK, BK, nLine, line)
 		}
 		//fmt.Println(I.strTransform(line))
 		if isPanicError {

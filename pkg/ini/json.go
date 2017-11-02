@@ -11,12 +11,12 @@ import (
 )
 
 var jsonSettingTrans map[string]string = map[string]string{
-	`\"`: "__JC__SG",
+	`\"`: "__JC__JSON_SG",
 }
 
 // json 字符串转移处理 isReconvert = true <-
 func jsonTransform(sJson string, isReconvert bool) string {
-	for v, k := range jsonSettingTrans {
+	for k, v := range jsonSettingTrans {
 		if isReconvert {
 			sJson = strings.Replace(sJson, v, k, -1)
 		} else {
@@ -25,6 +25,8 @@ func jsonTransform(sJson string, isReconvert bool) string {
 	}
 	return sJson
 }
+
+// queue 转化为 字符串
 func ToJsonStr(queue map[string]interface{}) string {
 	jsonStr := ""
 	jsonStrArr := []string{}

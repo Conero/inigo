@@ -3,6 +3,26 @@
 
 ## CHANGELOG - 更新日志
 
+### v1.0.3 / 20171102
+- (优化) BBA 
+    - func (bba *BBA) MiltiLineToArray(value string) *BBA
+    - 添加 ValueKey/ValueArray 属性用于实现 数组分行写法的解析
+```ini
+    key = {
+        key = value
+        test = {
+            v1
+            v2
+            v3
+            v5,
+            v8,
+            v10
+        }
+    }
+```    
+- (优化) json.go
+    - func jsonTransform(sJson string, isReconvert bool) string    逻辑修复
+
 ### v1.0.2 / 20171101
 - (新增) Ini.DataQueue 转化为 json 字符串方法
     - 新增文件 json.go
