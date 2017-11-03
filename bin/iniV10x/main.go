@@ -3,20 +3,28 @@ package main
 import (
 	"../../pkg/ini"
 	"../../pkg/rong"
+	"../../pkg/running"
 	"fmt"
+	"os"
+	"io/ioutil"
 )
 
 // ini-test
 func testV10x() {
 	// 相对地址，在包里无法读取文件
 	//test := ini.Open("./test-v1.0.x.ini")
+	rt := running.CreateTimer()
 	test := ini.Open("D:/Joshua/Active/go/ini-go/bin/iniV10x/test-v1.0.x.ini")
 	if !test.IsSuccess {
 		fmt.Println(test.FailMsg)
 	}
+	// 运行秒数
+	fmt.Println("运行秒数(s): ", rt.GetSec())
 	// 输出解析后的对象
 	fmt.Println(test.DataQueue)
 	fmt.Println(test.ToJsonString())
+	writeToFile(ini.VERSION+"-test-to.json",test.ToJsonString())
+
 }
 
 // Rong test
@@ -37,4 +45,22 @@ func main() {
 	fmt.Println(ini.VERSION)
 	testV10x()
 	//RongTest()
+}
+
+// 文件写入测试
+func writeToFile(name, content string){
+	dir := "./tmps/"
+	/*
+	fi, _ := os.Lstat(dir)
+	if !fi.IsDir(){
+		os.Mkdir(dir, os.ModeDir)
+	}
+	*/
+	//os.Mkdir(dir, os.ModeDir)
+	//os.Mkdir(dir, 0666)
+	//fmt.Println(os.Mkdir(dir, 0666))
+	os.Mkdir(dir, os.ModePerm)
+
+	path := dir + name
+	ioutil.WriteFile(path, []byte(content), 0666)
 }

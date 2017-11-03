@@ -18,6 +18,7 @@ type BBA struct {
 	CBaseValues []map[string]interface{} // 枝基键值
 	BranchQueue map[string]interface{}   // 分支队列
 	DataQueue   map[string]interface{}   // 数据队列值
+	BranchRunning []map[string]interface{}
 }
 
 //生成基枝分析模型实例

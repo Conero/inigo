@@ -88,6 +88,7 @@ func (I *Ini) parseFile(fs *os.File) {
 			}
 			// 获取基键
 			isBK, BK, nLine := I.getBaseKey(line)
+			fmt.Println(isBK, BK, nLine, line)
 			if isBK { // 是基键
 				bba.UpdateBaseKey(BK)
 				continue
@@ -97,7 +98,7 @@ func (I *Ini) parseFile(fs *os.File) {
 			} else {
 				bba.MiltiLineToArray(nLine)
 			}
-			fmt.Println(isBK, BK, nLine, line)
+			//fmt.Println(isBK, BK, nLine, line)
 		}
 		//fmt.Println(I.strTransform(line))
 		if isPanicError {

@@ -42,7 +42,7 @@ func ToJsonStr(queue map[string]interface{}) string {
 			jsonStrArr = append(jsonStrArr, `"`+k+`": `+cJsonStr)
 		case []string:
 			cJsonStr := strings.Join(v.([]string), `","`)
-			jsonStrArr = append(jsonStrArr, `"`+k+`": [`+cJsonStr+`]`)
+			jsonStrArr = append(jsonStrArr, `"`+k+`": ["`+cJsonStr+`"]`)
 		}
 	}
 	if len(jsonStrArr) > 0 {
