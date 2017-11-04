@@ -6,9 +6,9 @@
 package running
 
 import (
-	"time"
 	"fmt"
 	"strconv"
+	"time"
 )
 
 // 时间运行器
@@ -39,7 +39,7 @@ func (Rt *RTime) GetSec() float64 {
 }
 
 // 获取运行秒为字符串
-func (Rt *RTime) GetSecString(bit int)  string {
+func (Rt *RTime) GetSecString(bit int) string {
 	DetSec := float64(Rt.GetNanoSec()) / float64(1E9)
 	return fmt.Sprintf("%0."+strconv.Itoa(bit)+"f", DetSec)
 }

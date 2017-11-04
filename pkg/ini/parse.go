@@ -86,6 +86,21 @@ func (I *Ini) parseFile(fs *os.File) {
 				bba.CommitQueue()
 				continue
 			}
+			// 多行字符串/字符串数组
+			isMl, isEnd, mKey, mValue := I.mLineString(line)
+			if isMl {
+				continue
+			}
+			// 多行数组结束
+			if isEnd {
+				if len(mKey) > 0{
+					bba.PushQueue(mKey, mValue)
+				}else{
+					bba.MiltiLineToArray(mValue)
+				}
+				continue
+			}
+
 			// 获取基键
 			isBK, BK, nLine := I.getBaseKey(line)
 			//fmt.Println(isBK, BK, nLine, line)

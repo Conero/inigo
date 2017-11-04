@@ -5,6 +5,8 @@
  */
 package ini
 
+import "strconv"
+
 // 文件解析先关信息
 type File struct {
 	line int // 总行数
@@ -16,7 +18,13 @@ func (file *File) countLine() *File {
 	//println("$ line ):- ", file.line)
 	return file
 }
+
 // 获取当前行数
 func (file *File) GetLine() int {
 	return file.line
+}
+
+// 获取当前行数 字符串类型
+func (file *File) GetLineString() string {
+	return strconv.Itoa(file.line)
 }

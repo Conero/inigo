@@ -11,6 +11,12 @@ import (
 	"strings"
 )
 
+const (
+	//正式发布时删除当前的代码
+	//OnlyTestPutOut = true
+	OnlyTestPutOut = false
+)
+
 // CBaseKeys => CBaseValues
 // 基枝模型
 type BBA struct {
@@ -19,7 +25,6 @@ type BBA struct {
 	BranchRunning     []map[string]interface{} // 分支运行值
 	BRCIdx            int                      // 分支当前的索引值
 	BRCkey            string                   // 分支当前的map键
-	MlString          string                   // 多行数组
 	MlValue           interface{}              // 多行抽象类型
 	Ini               *Ini                     // Ini 对象
 }
@@ -32,7 +37,7 @@ func BBAnalyze(I *Ini) *BBA {
 		BRCkey:            "",
 		BranchRunning:     []map[string]interface{}{},
 		BranchRunningKeys: []string{},
-		Ini: I,
+		Ini:               I,
 	}
 	return bba
 }
@@ -53,8 +58,10 @@ func (bba *BBA) UpdateBaseKey(bKey string) {
 	}
 	bba.BRCIdx = bba.BRCIdx + 1
 	bba.BranchRunningKeys = append(bba.BranchRunningKeys, bKey)
-	fmt.Println("1). ", bba.BranchRunningKeys, bKey, bba.BRCIdx, "----->1.0P(解析出基枝)", bba.Ini.File.GetLine())
-	fmt.Println("    1.a", bba.DataQueue)
+	if OnlyTestPutOut {
+		fmt.Println("1). ", bba.BranchRunningKeys, bKey, bba.BRCIdx, "----->1.0P(解析出基枝)", bba.Ini.File.GetLine())
+		fmt.Println("    1.a", bba.DataQueue)
+	}
 }
 
 // 推值送到分支列队
@@ -68,11 +75,15 @@ func (bba *BBA) PushQueue(key string, value interface{}) *BBA {
 		//} else {
 	} else if bba.BRCIdx > -1 {
 		isUpdateMk := false
-		//println(bba.BRCIdx, "<&>", bba.BranchRunning, bba.BranchRunningKeys)
-		fmt.Println("2)  2a.",bba.BRCIdx, bba.BRCkey ,"<&>(推送值到数据中心/map)", value, key)
-		fmt.Println("       2b.", bba.BranchRunning, bba.BranchRunningKeys)
+		if OnlyTestPutOut {
+			//println(bba.BRCIdx, "<&>", bba.BranchRunning, bba.BranchRunningKeys)
+			fmt.Println("2)  2a.", bba.BRCIdx, bba.BRCkey, "<&>(推送值到数据中心/map)", value, key)
+			fmt.Println("       2b.", bba.BranchRunning, bba.BranchRunningKeys)
+		}
 		tmpMap := bba.BranchRunning[bba.BRCIdx]
-		fmt.Println("       2c.",tmpMap, bba.BranchRunning, bba.BRCIdx, bba.BranchRunningKeys, ".------------>2", bba.Ini.File.GetLine(), value, key)
+		if OnlyTestPutOut {
+			fmt.Println("       2c.", tmpMap, bba.BranchRunning, bba.BRCIdx, bba.BranchRunningKeys, ".------------>2", bba.Ini.File.GetLine(), value, key)
+		}
 		if tmpMap["isInit"] == false { // 如果还没有初始化并且，首先是map时
 			tmpMap["map"] = map[string]interface{}{
 				key: value,
@@ -85,7 +96,6 @@ func (bba *BBA) PushQueue(key string, value interface{}) *BBA {
 			if tmpMap["type"] == "MAP" || tmpMap["type"] == "BOTH" { // 检测到的全部为 map
 				tMValue = tmpMap["map"].(map[string]interface{})
 				tMValue[key] = value
-				//fmt.Println(tMValue, tmpMap["map"], ".------------>2.1", bba.Ini.File.GetLine())
 			} else { // 检测到的为 array -> both
 				tmpMap["type"] = "BOTH"
 				tMValue = map[string]interface{}{
@@ -120,7 +130,7 @@ func (bba *BBA) MiltiLineToArray(value string) *BBA {
 			isUpdateMk = true
 		} else if tmpMap["isInit"] == true { // 已经初始化
 			tArrayValue := tmpMap["array"].([]interface{})
-			if tmpMap["type"] == "ARRAY" || tmpMap["type"] == "BOTH"{ // 检测到的全部为 array
+			if tmpMap["type"] == "ARRAY" || tmpMap["type"] == "BOTH" { // 检测到的全部为 array
 				tArrayValue = append(tArrayValue, value)
 			} else {
 				tmpMap["type"] = "BOTH"
@@ -162,8 +172,11 @@ func (bba *BBA) CommitQueue() bool {
 		}
 		//BRCLen = BRCLen - 1
 		if BRCLen > 0 {
-			fmt.Println(bba.BranchRunningKeys, bba.BranchRunning, bba.DataQueue, "{---->3.0a")
-			BRCLen = BRCLen - 1
+			if OnlyTestPutOut {
+				fmt.Println("       3.a.a", bba.BranchRunningKeys, bba.BranchRunning, bba.DataQueue, "{---->3.0a")
+			}
+
+			//BRCLen = BRCLen - 1
 			//tmpMap2 := bba.BranchRunning[BRCLen]
 			// 此处可优化
 			/*
@@ -175,6 +188,9 @@ func (bba *BBA) CommitQueue() bool {
 			bba.BRCkey = bba.BranchRunningKeys[BRCLen]
 			bba.BranchRunning = bba.BranchRunning[0:BRCLen]
 			bba.BranchRunningKeys = bba.BranchRunningKeys[0:BRCLen]
+			if OnlyTestPutOut {
+				fmt.Println("       3.a.b-"+bba.Ini.File.GetLineString(), bba.BranchRunningKeys, bba.BranchRunning, bba.DataQueue, "{---->3.0a")
+			}
 		} else { // 顶级时
 			bba.BranchRunning = []map[string]interface{}{}
 			bba.BRCkey = ""
@@ -183,8 +199,10 @@ func (bba *BBA) CommitQueue() bool {
 		//bba.BRCIdx = bba.BRCIdx - 1
 		//println(bba.BRCkey, key, value, "{->", tmpMap, bba.BranchRunning, BRCLen)
 		bba.BRCIdx = bba.BRCIdx - 1
-		fmt.Println("3).   ", BRCLen, bba.BRCIdx, bba.BRCkey, key, value, "{-->3（剪枝处理）", BRCLen, bba.Ini.File.GetLine())
-		fmt.Println("       3.a", tmpMap, bba.BranchRunning, bba.BranchRunningKeys)
+		if OnlyTestPutOut {
+			fmt.Println("3).   ", BRCLen, bba.BRCIdx, bba.BRCkey, key, value, "{-->3（剪枝处理）", BRCLen)
+			fmt.Println("       3.a-"+bba.Ini.File.GetLineString(), tmpMap, bba.BranchRunning, bba.BranchRunningKeys)
+		}
 		bba.PushQueue(key, value)
 		isSuccess = true
 	}

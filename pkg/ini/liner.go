@@ -13,7 +13,10 @@ import (
 
 // 行处理结构体
 type Liner struct {
-	MultiCommentIngMk bool // 多行注释标注
+	MultiCommentIngMk bool   // 多行注释标注
+	IsMlMk            bool   // 多行标识
+	MlString          string // 多行数组
+	MlKey             string // 多行键值缓存
 }
 
 // 是否为注释行
@@ -21,6 +24,8 @@ func (line Liner) isComment(sLine string) bool {
 	matched, _ := regexp.MatchString(IniParseSettings["reg_comment"], sLine)
 	return matched
 }
+
+// 是否为多行注释
 func (line *Liner) isMultiComment(sLine string) bool {
 	shouldToNextLine := false
 	// 多行注释介绍
@@ -87,6 +92,20 @@ func (line Liner) lineToKeyV(sLine string) (bool, string, interface{}) {
 	if idx != -1 {
 		hasEqual = true
 		key = strings.TrimSpace(sLine[0:idx])
+	}
+	return hasEqual, key, value
+}
+
+// 行转变为键值对
+func (line Liner) lineSplitKV(sLine string) (bool, string, string) {
+	hasEqual := false
+	key := ""
+	value := ""
+	idx := strings.Index(sLine, IniParseSettings["equal"])
+	if idx != -1 {
+		hasEqual = true
+		key = strings.TrimSpace(sLine[0:idx])
+		value = strings.TrimSpace(sLine[idx+1:])
 	}
 	return hasEqual, key, value
 }
@@ -166,4 +185,54 @@ func (line Liner) strToData(sLine string) interface{} {
 		value = line.transRecover(sLine)
 	}
 	return value
+}
+
+// 多行字符串标点清洗
+func (line Liner) mLineSgClear(cLine string) string{
+	clearReg := regexp.MustCompile(IniParseSettings["reg_clear_mls"])
+	cLine = clearReg.ReplaceAllString(cLine, "")
+	return  cLine
+}
+// 多行字符串
+func (line *Liner) mLineString(cLine string) (bool, bool, string, string) {
+	cLine = line.strTransform(cLine)
+	onMlineMk := false
+	isEnd := false
+	MlKey := ""
+
+	// 正处于多行字符串，检测
+	if line.IsMlMk {
+		onMlineMk = true
+	}
+	if onMlineMk {
+		// 结束多行字符串值
+		if matched, _ := regexp.MatchString(IniParseSettings["reg_mlstring_end"], cLine); matched {
+			isEnd = true
+			onMlineMk = false
+			cLine = line.mLineSgClear(cLine)
+			MlKey = line.MlKey
+			line.MlKey = ""
+			line.IsMlMk = false
+		}
+		line.MlString = line.MlString + "\r\n" + line.transRecover(cLine)
+	} else {
+		// 检测时为多上行字符串
+		if matched, _ := regexp.MatchString(IniParseSettings["reg_is_mlstring"], cLine); matched {
+			isE, key, value := line.lineSplitKV(cLine)
+			if isE {
+				onMlineMk = true
+				line.MlKey = key
+				MlKey = line.MlKey
+				value = line.mLineSgClear(value)
+				line.MlString = line.transRecover(value)
+				line.IsMlMk = true
+			}
+		}else if matched, _ := regexp.MatchString(IniParseSettings["reg_is_mlstring_nk"], cLine); matched {	// 无键值字符串
+			line.MlKey = ""
+			line.IsMlMk = true
+			line.MlString = line.transRecover(cLine)
+		}
+	}
+	println("$ ----> ", onMlineMk, isEnd, cLine, line.MlKey, line.MlString)
+	return onMlineMk, isEnd, MlKey, line.MlString
 }

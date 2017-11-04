@@ -5,8 +5,8 @@ import (
 	"../../pkg/rong"
 	"../../pkg/running"
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 // ini-test
@@ -23,7 +23,7 @@ func testV10x() {
 	// 输出解析后的对象
 	fmt.Println(test.DataQueue)
 	fmt.Println(test.ToJsonString())
-	writeToFile(ini.VERSION+"-test-to.json",test.ToJsonString())
+	writeToFile(ini.VERSION+"-test-to.json", test.ToJsonString())
 
 }
 
@@ -48,13 +48,13 @@ func main() {
 }
 
 // 文件写入测试
-func writeToFile(name, content string){
+func writeToFile(name, content string) {
 	dir := "./tmps/"
 	/*
-	fi, _ := os.Lstat(dir)
-	if !fi.IsDir(){
-		os.Mkdir(dir, os.ModeDir)
-	}
+		fi, _ := os.Lstat(dir)
+		if !fi.IsDir(){
+			os.Mkdir(dir, os.ModeDir)
+		}
 	*/
 	//os.Mkdir(dir, os.ModeDir)
 	//os.Mkdir(dir, 0666)

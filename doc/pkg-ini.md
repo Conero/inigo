@@ -3,6 +3,29 @@
 
 ## CHANGELOG - 更新日志
 
+### v1.0.6 / 20171104
+- (新增)
+    - 支持***字符串跨行***， 可用于 []string 内的值
+    - BBAnalyze.go master 分支内暂时使用可关闭调试器
+
+- (优化) BBA
+    - 删除 BBAnalyze.go  原来的分析模型，用新的方法替代
+    - variable.go 中添加与模型解析相关的***正则表达式***
+    - 暂时引入 ***OnlyTestPutOut***常用，仅仅用在开发脚本中(测试条件下)， 正式版本将删除
+    - liner.go 添加与字符串跨行先关的方法
+
+- (优化) BBAnalyze 解析过程中，多级 map 出错的的问题    @1.0.5 版本测试时出现
+    - golang 中切片子切片时，出错
+```go
+    // 8bit
+    test := []int{1, 2, 5, 7, 6, 8, 9, 5}
+    fmt.Println(test)
+
+    // 取子切片
+    bit := 2            // 为子字符串的长度，而非偏移量()
+    test = test[0: bit]
+```
+
 ### v1.0.5 / 20171104
 - (优化) BBA
     - BBAnalyze.go 内部引入用于调试的格式文件输出
