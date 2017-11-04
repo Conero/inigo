@@ -13,5 +13,10 @@ type File struct {
 // 行计数器
 func (file *File) countLine() *File {
 	file.line = file.line + 1
+	//println("$ line ):- ", file.line)
 	return file
+}
+// 获取当前行数
+func (file *File) GetLine() int {
+	return file.line
 }

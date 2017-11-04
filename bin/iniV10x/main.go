@@ -42,7 +42,7 @@ func RongTest() {
 
 // 入口测试
 func main() {
-	fmt.Println(ini.VERSION)
+	//fmt.Println(ini.VERSION)
 	testV10x()
 	//RongTest()
 }

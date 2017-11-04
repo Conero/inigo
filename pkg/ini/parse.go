@@ -56,7 +56,7 @@ func (I *Ini) reader() {
 // 解析文件
 func (I *Ini) parseFile(fs *os.File) {
 	buf := bufio.NewReader(fs)
-	bba := BBAnalyze()
+	bba := BBAnalyze(I)
 	for {
 		line, err := buf.ReadString('\n')
 		// 程序跳转前检测是否出错，出错直接中断循环，避免还没有检查错误时便继续进入循环(死循环)
@@ -88,7 +88,7 @@ func (I *Ini) parseFile(fs *os.File) {
 			}
 			// 获取基键
 			isBK, BK, nLine := I.getBaseKey(line)
-			fmt.Println(isBK, BK, nLine, line)
+			//fmt.Println(isBK, BK, nLine, line)
 			if isBK { // 是基键
 				bba.UpdateBaseKey(BK)
 				continue
