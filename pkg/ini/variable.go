@@ -10,8 +10,9 @@ package ini
 const (
 	AUTHOR    = "Joshua Conero" // @author 作者
 	VERSION   = "1.0.6"         // @version	版本号
+	BUILD     = "20171104"      // @version	版本号
 	NAME      = "go ini 文件解析库"  // @name 名称
-	START     = "20171104"      // @start 开始时间
+	START     = "20171028"      // @start 开始时间
 	COPYRIGHT = "@Conero"       // @copyright 版权
 )
 
@@ -34,11 +35,11 @@ var IniParseSettings map[string]string = map[string]string{
 	"reg_clear_mls": `"|'`,        // 清除多行字符串中的字符
 	//"reg_is_mlstring":  `^[A-Za-z0-9_-]+[=\s]+("|').*[^"^']+$`, //	是多行字符正则开始,  否 key = "ttt" 是 key = " 888
 	"reg_is_mlstring":    `^[\w]+[=\s]+("|'){1}[^"']*$`, //	是多行字符正则开始,  否 key = "ttt" 是 key = " 888
-	"reg_is_mlstring_nk": `^["']{1}[^"'\,]+$`,                     //	是多行字符正则开始（无键值 no key）  "|'
+	"reg_is_mlstring_nk": `^["']{1}[^"'\,]+$`,           //	是多行字符正则开始（无键值 no key）  "|'
 	"reg_mlstring_sta":   `^['"].*`,                     //	多行字符正则开始
 	//"reg_mlstring_end": `[^=]*['"]+$`,                          // 多行字符正则结束
 	//"reg_mlstring_end": `^[^"'=]*['"]{1}$`, 				//	多行字符正则结束 不支持分隔符
-	"reg_mlstring_end": `^[^"'=]*['"\,]+$`, 				// 多行字符正则结束 支持分隔符
+	"reg_mlstring_end": `^[^"'=]*['"\,]+$`, // 多行字符正则结束 支持分隔符
 }
 
 // 转移字符解析

@@ -10,6 +10,7 @@ package rong
 const (
 	AUTHOR    = "Joshua Conero" // @author 作者
 	VERSION   = "1.0.0"         // @version	版本号
+	BUILD     = "20171028"      // 发布日期
 	NAME      = "go ini 文件解析库"  // @name 名称
 	START     = "2017-10-28"    // @start 开始时间
 	COPYRIGHT = "@Conero"       // @copyright 版权

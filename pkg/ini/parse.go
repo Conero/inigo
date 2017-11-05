@@ -8,7 +8,7 @@ package ini
 
 import (
 	"bufio"
-	"fmt"
+	//"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -121,8 +121,6 @@ func (I *Ini) parseFile(fs *os.File) {
 		}
 	}
 	I.DataQueue = bba.DataQueue
-	// 输出值测试
-	fmt.Println(I.DataQueue)
 }
 
 // 读取值
