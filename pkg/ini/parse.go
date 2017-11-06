@@ -68,7 +68,7 @@ func (I *Ini) parseFile(fs *os.File) {
 		line = strings.TrimSpace(line)
 		I.File.countLine()
 		// 非错误
-		if !isPanicError {
+		//if !isPanicError {
 			// 空行
 			if len(line) == 0 {
 				continue
@@ -96,7 +96,7 @@ func (I *Ini) parseFile(fs *os.File) {
 				if len(mKey) > 0{
 					bba.PushQueue(mKey, mValue)
 				}else{
-					bba.MiltiLineToArray(mValue)
+					bba.MultiLineToArray(mValue)
 				}
 				continue
 			}
@@ -111,10 +111,10 @@ func (I *Ini) parseFile(fs *os.File) {
 				//bba.PushQueue(BK, nLine)
 				bba.PushQueue(BK, I.strToData(nLine))
 			} else {
-				bba.MiltiLineToArray(nLine)
+				bba.MultiLineToArray(nLine)
 			}
 			//fmt.Println(isBK, BK, nLine, line)
-		}
+		//}
 		//fmt.Println(I.strTransform(line))
 		if isPanicError {
 			break
@@ -124,8 +124,23 @@ func (I *Ini) parseFile(fs *os.File) {
 }
 
 // 读取值
+// 支持点级多级数据查询
 func (I *Ini) Get(key string) (bool, interface{}) {
-	value, has := I.DataQueue[key]
+	//value, has := I.DataQueue[key]
+	has := false
+	var value interface{}
+	// 默认数据类型
+	value = I.DataQueue
+	for _,v := range strings.Split(key, "."){
+		switch value.(type) {
+		case map[string]interface{}:
+			tValue, tHas := value.(map[string]interface{})[v]
+			has = tHas
+			if has{
+				value = tValue
+			}
+		}
+	}
 	return has, value
 }
 

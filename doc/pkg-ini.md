@@ -3,6 +3,27 @@
 
 ## CHANGELOG - 更新日志
 
+### v1.0.7 / 20171107
+- (优化) BBA
+    - 删除 BBA中的 BRCKey 属性， 直接使用 BranchRuning 机制实现
+    - 新增 获取当前指向的 键值(原BRCKey) 的方法
+        - func (bba *BBA) getCurrentKeyMap() (string, map[string]interface{}) 
+    - 尝试使用 BranchRuning 机制实现***字符串***跨行解析
+    - ***type=BOTH***优化，使其更加符号实际逻辑， 也即是不打乱： map/string 中的顺序
+- (优化) parse.go
+    - 修复文件最后一行无法遍历的原因(可寻找更好的方法优化)
+    - func (I *Ini) Get(key string) (bool, interface{}) 
+        - 实现“.”操作多级解析文件
+- 其他
+    - 新增 php/ini 算法跨速测试文本
+    - 当前版本基本实现了ini文件的解析(可以用用其他的项目中)
+        - 字符串跨行解析
+        - 多级 map 遍历
+        - 字符串跨行解析
+    - 计划实现
+        - 二维数据解析
+        - array 中有 map/以及string 类型的解析
+
 ### v1.0.6 / 20171104
 - (新增)
     - 支持***字符串跨行***， 可用于 []string 内的值

@@ -6,6 +6,7 @@ package main
 import (
 	"../../pkg/ini"
 	"../../pkg/rong"
+	"../../pkg/running"
 	"fmt"
 	"os"
 	"regexp"
@@ -15,8 +16,8 @@ import (
 
 const (
 	Name    = "PkgIniCli"
-	Version = "0.0.1"
-	Build   = "20171105"
+	Version = "0.0.2"
+	Build   = "20171106"
 	Start   = "20171105"
 	Author  = "Joshua Conero"
 )
@@ -127,7 +128,8 @@ func (cli *Cli) IndexAction() {
 func (cli *Cli) HelpAction() {
 	fmt.Println(`
 	--ini		ini 包文件解析测试
-	    . <ini-file> <json[=jsonname]>	解析文件输出为json 字符串
+		. <ini-file>  <json[=jsonname]>	解析文件输出为json 字符串
+		. <ini-file>  <get=key1.key2.key3> 读取解析成功以后的值
 	--roung		rong 包文件文件解析测试
 	--help		程序帮助
 	`)
@@ -139,11 +141,15 @@ func (cli *Cli) IniAction() {
 	if "" != name{
 		show(name+"文件正在等解析.")
 		is := ini.Open(name)
+		Rt := running.CreateTimer()
 		if !is.IsSuccess{
 			show(is.FailMsg, "F")
 			return
 		}
+		show("文件解析完成： "+Rt.GetSecString(4)+"s, 共"+is.File.GetLineString()+"行")
 		oKey, oName := cli.getParamKV(2)
+		oKey = strings.ToLower(oKey)
+		// 保存解析文件为 json 文件格式
 		if oKey == "json"{
 			if oName != ""{
 				oName = "./ini-"+oName+".json"
@@ -152,8 +158,19 @@ func (cli *Cli) IniAction() {
 				oName = "./ini-"+fName+"-v"+ini.VERSION+".json"
 			}
 			writeToFile(oName, is.ToJsonString())
+		}else if oKey == "get"{
+			// 输出整解析后的内容
+			if oName == ""{
+				fmt.Println("   ", is.DataQueue)
+			}else{
+				has, dd := is.Get(oName)
+				if has{
+					fmt.Println("  -->", dd)
+				}else {
+					fmt.Println("  ", oName+"值不存在！")
+				}
+			}
 		}
-		fmt.Println("   ", is.DataQueue)
 	}
 }
 

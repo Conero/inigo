@@ -1,5 +1,6 @@
 # BBAnalyze - (BBA 分析模型)
 - 2017年11月5日 星期日
+- 自定义 ini 文件格式: 语法树分析处理
 
 
 ## BBA-struct
@@ -31,10 +32,9 @@ type BBA struct {
     mLValue = interface{}  多行抽象值
     BranchRunningKeys => []string{}     // BranchRunning 孪生匹配键值     默认： JC__SCOPE   虚拟键值，用于(无键值的)跨行数组
     BranchRunning => [
-        [string] = {
+        {
             type = MAP/ARRAY/BOTH/STRING      ; 类型 map/array/both/string
             onlysa = bool         ; 仅仅是 string-array， (type = ARRAY)
-
             isInit = bool         ; 初始化标记
             ; value = []interface{} / map[string]interface{} 遗弃，使用两者共同代替
             array = []interface{}

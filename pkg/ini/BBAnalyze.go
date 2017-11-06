@@ -24,7 +24,6 @@ type BBA struct {
 	BranchRunningKeys []string                 // 分支运行值 孪生键值缓存
 	BranchRunning     []map[string]interface{} // 分支运行值
 	BRCIdx            int                      // 分支当前的索引值
-	BRCkey            string                   // 分支当前的map键
 	MlValue           interface{}              // 多行抽象类型
 	Ini               *Ini                     // Ini 对象
 }
@@ -34,27 +33,34 @@ func BBAnalyze(I *Ini) *BBA {
 	bba := &BBA{
 		DataQueue:         map[string]interface{}{},
 		BRCIdx:            -1,
-		BRCkey:            "",
 		BranchRunning:     []map[string]interface{}{},
 		BranchRunningKeys: []string{},
 		Ini:               I,
 	}
 	return bba
 }
-
+// 获取系统当前的键值以及配置数据
+func (bba *BBA) getCurrentKeyMap() (string, map[string]interface{}) {
+	key := ""
+	settingMap := map[string]interface{}{}
+	if bba.BRCIdx > -1{
+		key = bba.BranchRunningKeys[bba.BRCIdx]
+		settingMap = bba.BranchRunning[bba.BRCIdx]
+	}
+	return key, settingMap
+}
 // 更新基键值， 可能为map/array 键值
 func (bba *BBA) UpdateBaseKey(bKey string) {
-	bba.BRCkey = bKey
-	tmpMap := map[string]interface{}{
+	// setting map
+	sMap := map[string]interface{}{
 		"isInit": false,
 	}
-
 	// 行分支不存在缓存时，先环境准备
 	if -1 == bba.BRCIdx {
 		// 分支
-		bba.BranchRunning = []map[string]interface{}{tmpMap}
+		bba.BranchRunning = []map[string]interface{}{sMap}
 	} else { // 已经存在值时
-		bba.BranchRunning = append(bba.BranchRunning, tmpMap)
+		bba.BranchRunning = append(bba.BranchRunning, sMap)
 	}
 	bba.BRCIdx = bba.BRCIdx + 1
 	bba.BranchRunningKeys = append(bba.BranchRunningKeys, bKey)
@@ -66,7 +72,7 @@ func (bba *BBA) UpdateBaseKey(bKey string) {
 
 // 推值送到分支列队
 func (bba *BBA) PushQueue(key string, value interface{}) *BBA {
-	if bba.BRCkey == "" { // 推送数据到顶层数据中心
+	if -1 == bba.BRCIdx { // 推送数据到顶层数据中心
 		bba.DataQueue[key] = value
 		// 同步初始化处理
 		bba.BRCIdx = -1
@@ -75,133 +81,149 @@ func (bba *BBA) PushQueue(key string, value interface{}) *BBA {
 		//} else {
 	} else if bba.BRCIdx > -1 {
 		isUpdateMk := false
+		sKey, sMap := bba.getCurrentKeyMap()
 		if OnlyTestPutOut {
 			//println(bba.BRCIdx, "<&>", bba.BranchRunning, bba.BranchRunningKeys)
-			fmt.Println("2)  2a.", bba.BRCIdx, bba.BRCkey, "<&>(推送值到数据中心/map)", value, key)
+			fmt.Println("2)  2a.", bba.BRCIdx, sKey, "<&>(推送值到数据中心/map)", value, key)
 			fmt.Println("       2b.", bba.BranchRunning, bba.BranchRunningKeys)
 		}
-		tmpMap := bba.BranchRunning[bba.BRCIdx]
+		//tmpMap := bba.BranchRunning[bba.BRCIdx]
 		if OnlyTestPutOut {
-			fmt.Println("       2c.", tmpMap, bba.BranchRunning, bba.BRCIdx, bba.BranchRunningKeys, ".------------>2", bba.Ini.File.GetLine(), value, key)
+			fmt.Println("       2c.", sMap, bba.BranchRunning, bba.BRCIdx, bba.BranchRunningKeys, ".------------>2", bba.Ini.File.GetLine(), value, key)
 		}
-		if tmpMap["isInit"] == false { // 如果还没有初始化并且，首先是map时
-			tmpMap["map"] = map[string]interface{}{
+		if sMap["isInit"] == false { // 如果还没有初始化并且，首先是map时
+			sMap["map"] = map[string]interface{}{
 				key: value,
 			}
-			tmpMap["type"] = "MAP"
-			tmpMap["isInit"] = true
+			sMap["type"] = "MAP"
+			sMap["isInit"] = true
 			isUpdateMk = true
-		} else if tmpMap["isInit"] == true { // 已经初始化
+		} else if sMap["isInit"] == true { // 已经初始化
 			tMValue := map[string]interface{}{}
-			if tmpMap["type"] == "MAP" || tmpMap["type"] == "BOTH" { // 检测到的全部为 map
-				tMValue = tmpMap["map"].(map[string]interface{})
+			if sMap["type"] == "MAP"{ // 检测到的全部为 map
+				tMValue = sMap["map"].(map[string]interface{})
 				tMValue[key] = value
-			} else { // 检测到的为 array -> both
-				tmpMap["type"] = "BOTH"
+				sMap["map"] = tMValue
+			}else if sMap["type"] == "ARRAY" || sMap["type"] == "BOTH"{ // 检测到的为 array -> both
 				tMValue = map[string]interface{}{
 					key: value,
 				}
+				tMArray := []interface{}{}
+				if "ARRAY" == sMap["type"]{
+					tMArray = sMap["array"].([]interface{})
+					sMap["type"] = "BOTH"
+				}
+				tMArray = append(tMArray, tMValue)
+				sMap["array"] = tMValue
 			}
-			//tMValue[key] = value
-			tmpMap["map"] = tMValue
 			isUpdateMk = true
 		}
 		if isUpdateMk {
-			bba.BranchRunning[bba.BRCIdx] = tmpMap
+			bba.BranchRunning[bba.BRCIdx] = sMap
 		}
 	}
 	return bba
 }
 
 // 分行数组值推送
-func (bba *BBA) MiltiLineToArray(value string) *BBA {
+func (bba *BBA) MultiLineToArray(value string) *BBA {
 	// string,	-> string
 	//value = strings.TrimSpace(value)
 	if strings.LastIndex(value, IniParseSettings["limiter"]) == 0 {
 		value = value[0 : len(value)-2]
 	}
-	if bba.BRCkey != "" {
+	if  bba.BRCIdx > -1 {
 		isUpdateMk := false
-		tmpMap := bba.BranchRunning[bba.BRCIdx]
-		if tmpMap["isInit"] == false { // 如果还没有初始化并且，首先是array时
-			tmpMap["array"] = []interface{}{value}
-			tmpMap["type"] = "ARRAY"
-			tmpMap["isInit"] = true
+		_ , sMap := bba.getCurrentKeyMap()
+		if sMap["isInit"] == false { // 如果还没有初始化并且，首先是array时
+			sMap["array"] = []interface{}{value}
+			sMap["type"] = "ARRAY"
+			sMap["isInit"] = true
 			isUpdateMk = true
-		} else if tmpMap["isInit"] == true { // 已经初始化
-			tArrayValue := tmpMap["array"].([]interface{})
-			if tmpMap["type"] == "ARRAY" || tmpMap["type"] == "BOTH" { // 检测到的全部为 array
+		} else if sMap["isInit"] == true { // 已经初始化
+			//fmt.Println(sMap)
+			tArrayValue := sMap["array"].([]interface{})
+			if sMap["type"] == "ARRAY" || sMap["type"] == "BOTH" { // 检测到的全部为 array
 				tArrayValue = append(tArrayValue, value)
-			} else {
-				tmpMap["type"] = "BOTH"
-				tArrayValue = []interface{}{value}
+			} else if sMap["type"] == "MAP" {
+				sMap["type"] = "BOTH"
+				// 将历史的map中的值推送带array 中
+				for mKey, mValue := range sMap["map"].(map[string]interface{}){
+					tArrayValue = append(tArrayValue, map[string]interface{}{
+						mKey: mValue,
+					})
+				}
+				tArrayValue = append(tArrayValue, value)
 			}
-			tmpMap["array"] = tArrayValue
+			sMap["array"] = tArrayValue
 			isUpdateMk = true
 		}
 		if isUpdateMk {
-			bba.BranchRunning[bba.BRCIdx] = tmpMap
+			bba.BranchRunning[bba.BRCIdx] = sMap
 		}
 	}
 	return bba
+}
+
+// 跨行字符串解析
+func (bba *BBA) MultiLineString(line string)  {
+	_ , sMap := bba.getCurrentKeyMap()
+	// 非字符串时跳过
+	if sMap["type"] != "STRING"{
+		return
+	}
+	if !sMap["isInit"].(bool){
+		sMap["string"] = line
+		sMap["isInit"] = true
+		sMap["type"] = "STRING"
+	}else {
+		sMap["string"] = sMap["string"].(string) + line
+	}
+	bba.BranchRunning[bba.BRCIdx] = sMap
 }
 
 // 提交数据到外表 queue
 // 当前的基枝遍历完成，去基枝
 func (bba *BBA) CommitQueue() bool {
 	isSuccess := false
-	if bba.BRCIdx > -1 && bba.BRCkey != "" {
-		key := bba.BRCkey
-		BRCLen := len(bba.BranchRunning) - 1
-		//BRCLen := len(bba.BranchRunningKeys) - 1
-		tmpMap := bba.BranchRunning[bba.BRCIdx]
+	if bba.BRCIdx > -1 {
+		key , sMap := bba.getCurrentKeyMap()
+		//BRCLen := len(bba.BranchRunning) - 1
+		//tmpMap := bba.BranchRunning[bba.BRCIdx]
 		var value interface{}
 		value = ""
-		if tmpMap["isInit"] == false { // 空数组
+		if sMap["isInit"] == false { // 空数组
 			value = []string{}
-		} else if tmpMap["isInit"] == true {
-			switch tmpMap["type"] {
+		} else if sMap["isInit"] == true {
+			switch sMap["type"] {
 			case "ARRAY": // 纯数组
-				value = tmpMap["array"]
+				value = sMap["array"]
 			case "MAP": // 数组 map 类型
-				value = tmpMap["map"]
+				value = sMap["map"]
 			case "BOTH":
-				value = tmpMap["array"]
-				value = append(value.([]interface{}), tmpMap["map"])
+				value = sMap["array"]
+				value = append(value.([]interface{}), sMap["map"])
 			}
 		}
-		//BRCLen = BRCLen - 1
-		if BRCLen > 0 {
+		if bba.BRCIdx > 0 {
 			if OnlyTestPutOut {
 				fmt.Println("       3.a.a", bba.BranchRunningKeys, bba.BranchRunning, bba.DataQueue, "{---->3.0a")
 			}
-
-			//BRCLen = BRCLen - 1
-			//tmpMap2 := bba.BranchRunning[BRCLen]
-			// 此处可优化
-			/*
-				for k,_:= range tmpMap2{
-					bba.BRCkey = k
-					break
-				}
-			*/
-			bba.BRCkey = bba.BranchRunningKeys[BRCLen]
-			bba.BranchRunning = bba.BranchRunning[0:BRCLen]
-			bba.BranchRunningKeys = bba.BranchRunningKeys[0:BRCLen]
+			bba.BranchRunning = bba.BranchRunning[0:bba.BRCIdx]
+			bba.BranchRunningKeys = bba.BranchRunningKeys[0:bba.BRCIdx]
 			if OnlyTestPutOut {
 				fmt.Println("       3.a.b-"+bba.Ini.File.GetLineString(), bba.BranchRunningKeys, bba.BranchRunning, bba.DataQueue, "{---->3.0a")
 			}
 		} else { // 顶级时
 			bba.BranchRunning = []map[string]interface{}{}
-			bba.BRCkey = ""
 			bba.BranchRunningKeys = []string{}
 		}
 		//bba.BRCIdx = bba.BRCIdx - 1
 		//println(bba.BRCkey, key, value, "{->", tmpMap, bba.BranchRunning, BRCLen)
 		bba.BRCIdx = bba.BRCIdx - 1
 		if OnlyTestPutOut {
-			fmt.Println("3).   ", BRCLen, bba.BRCIdx, bba.BRCkey, key, value, "{-->3（剪枝处理）", BRCLen)
-			fmt.Println("       3.a-"+bba.Ini.File.GetLineString(), tmpMap, bba.BranchRunning, bba.BranchRunningKeys)
+			fmt.Println("3).   ", bba.BRCIdx, bba.BRCIdx, key, value, "{-->3（剪枝处理）", bba.BRCIdx)
+			fmt.Println("       3.a-"+bba.Ini.File.GetLineString(), sMap, bba.BranchRunning, bba.BranchRunningKeys)
 		}
 		bba.PushQueue(key, value)
 		isSuccess = true
