@@ -21,10 +21,10 @@ func testV10x() {
 	// 运行秒数
 	fmt.Println("运行秒数(s): ", rt.GetSec())
 	// 输出解析后的对象
-	fmt.Println(test.DataQueue)
-	fmt.Println(test.ToJsonString())
-	writeToFile(ini.VERSION+"-test-to.json", test.ToJsonString())
-
+	//fmt.Println(test.DataQueue)
+	//fmt.Println(test.ToJsonString())
+	//writeToFile(ini.VERSION+"-test-to.json", test.ToJsonString())
+	fmt.Println(test.Get("mapv10.map9.map8.name"))
 }
 
 // Rong test

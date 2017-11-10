@@ -3,6 +3,10 @@
 
 ## CHANGELOG - 更新日志
 
+### v1.0.8 / 20171110-
+- (优化) parse.go @20171110
+    - func (I *Ini) GetString(key string) string   方法支持多级“.”键值访问对象，利用 func (I *Ini) Get(key string) (bool, interface{}) 原型
+
 ### v1.0.7 / 20171107
 - (优化) BBA
     - 删除 BBA中的 BRCKey 属性， 直接使用 BranchRuning 机制实现

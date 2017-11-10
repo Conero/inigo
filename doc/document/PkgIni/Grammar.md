@@ -4,8 +4,8 @@
 
 ## 概述
 - 解析属性选项
-    - $Conero.INI__AutoInferType        自动类型推断
-        - 简写：  $C.INI__AIT
+    - @Conero.INI__AutoInferType        自动类型推断
+        - 简写：  @C.INI__AIT
         - 自动类型推断开启， 文件头部设置
         - 经过正则匹配指定的类型
         - 设计/构想日期   @2017年11月6日 星期一

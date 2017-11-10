@@ -145,9 +145,10 @@ func (I *Ini) Get(key string) (bool, interface{}) {
 }
 
 // 读取函数为字符串
+// 支持点操作，多级数据获取
 func (I *Ini) GetString(key string) string {
-	anyType, exist := I.DataQueue[key]
 	value := ""
+	exist, anyType := I.Get(key)
 	if exist {
 		switch anyType.(type) {
 		case string:
