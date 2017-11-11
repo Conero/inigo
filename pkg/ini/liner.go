@@ -82,7 +82,17 @@ func (line Liner) transRecover(sLine string) string {
 	sLine = strings.Replace(sLine, "\\", "", -1)
 	return sLine
 }
-
+// 注释字符转移
+func (line Liner) transComment(sLine string, isCover bool) string {
+	for raw,trans := range TranCommentMap{
+		if isCover{
+			sLine = strings.Replace(sLine, trans, raw, -1)
+		}else{
+			sLine = strings.Replace(sLine, raw, trans, -1)
+		}
+	}
+	return sLine
+}
 // 行转变为键值对
 func (line Liner) lineToKeyV(sLine string) (bool, string, interface{}) {
 	hasEqual := false

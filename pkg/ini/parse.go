@@ -8,10 +8,10 @@ package ini
 
 import (
 	"bufio"
-	//"fmt"
 	"os"
 	"strconv"
 	"strings"
+	"regexp"
 )
 
 // ini 结构体
@@ -86,6 +86,13 @@ func (I *Ini) parseFile(fs *os.File) {
 				bba.CommitQueue()
 				continue
 			}
+			line = I.transComment(line, false)
+			regCmt := regexp.MustCompile(IniParseSettings["reg_has_comment"])
+			CmtIdx := regCmt.FindStringIndex(line)
+			if CmtIdx != nil{
+				line = strings.TrimSpace(line[0:CmtIdx[0]])
+			}
+			line = I.transComment(line, true)
 			// 多行字符串/字符串数组
 			isMl, isEnd, mKey, mValue := I.mLineString(line)
 			if isMl {
@@ -168,5 +175,5 @@ func (I *Ini) HasKey(key string) bool {
 
 // 转化为json字符串
 func (I *Ini) ToJsonString() string {
-	return ToJsonStr(I.DataQueue)
+	return MkCreator(I.DataQueue).ToJsonString()
 }

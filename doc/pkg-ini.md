@@ -3,9 +3,23 @@
 
 ## CHANGELOG - 更新日志
 
-### v1.0.8 / 20171110-
-- (优化) parse.go @20171110
-    - func (I *Ini) GetString(key string) string   方法支持多级“.”键值访问对象，利用 func (I *Ini) Get(key string) (bool, interface{}) 原型
+### v1.1.0 / 20171111
+- (优化) parse.go
+    - func (I *Ini) GetString(key string) string   方法支持多级“.”键值访问对象，利用 func (I *Ini) Get(key string) (bool, interface{}) 原型 @20171110
+    - 支持在有效行后注释文本如： *** key = value ;或# 注释文本 *** 
+- (优化) 文件格式生成器
+    - renamed:    pkg/ini/json.go -> pkg/ini/creator.go
+    - 将原来的函数，利用新增的 *** Creator *** 结构体实现
+    - json 生成器支持多级格式化字符串， 删除原来的 json 字符中的转义处理
+    - (新增) map -> ini 文件格式化处理器， 支持多级嵌套
+- (新增)  Container.go    新增数据结构抽象化
+    - 关联文件生成器“ini”/“json”文件格式解析器
+    - 关联ini文件解析器，用于对解析的数据进行处理以及更新操作
+    - 提供简单的增删改查操作    
+- 其他
+    - 本次更新标记为大版本更新： 
+        - v1.1.x:   + ini 文件生成器实现， 解析器优化
+        - v1.0.x:   + ini 文件解析实现
 
 ### v1.0.7 / 20171107
 - (优化) BBA

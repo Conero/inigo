@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"time"
 )
 
 // ini-test
@@ -25,6 +26,31 @@ func testV10x() {
 	//fmt.Println(test.ToJsonString())
 	//writeToFile(ini.VERSION+"-test-to.json", test.ToJsonString())
 	fmt.Println(test.Get("mapv10.map9.map8.name"))
+	writeToFile(ini.VERSION+"-test-ini-creator.ini", ini.MkCreator(test.DataQueue).ToIniString())
+	writeToFile(ini.VERSION+"-test-ini-creator.json", ini.MkCreator(test.DataQueue).ToJsonString())
+
+	// 生成器测试
+	crt := ini.MkContainer()
+	crt.Set("name", "pkg/ini 文件生成器").
+		Set("date", time.Now().String()).
+		Set("test", "test").
+		Set("map", map[string]string{
+			"name": "map 格式",
+			"author": "Joshua Conero",
+		}).
+		Set("map_class2", map[string]interface{}{
+		"map": map[string]interface{}{
+				"name": "map 格式",
+				"author": "Joshua Conero",
+			},
+		}).
+		Set("array", []string{"I", "LOVE", "U", "Sus"})
+
+	writeToFile(ini.VERSION+"-self-ini-creator.ini", crt.ToIniString())
+	writeToFile(ini.VERSION+"-self-ini-creator.json", crt.ToJsonString())
+
+	// 运行秒数
+	fmt.Println("#2运行秒数(s): ", rt.GetSec())
 }
 
 // Rong test

@@ -14,6 +14,7 @@
             - 17.012     -> float
             - 其他        -> string
             - true/false  -> bool                   大小写不敏感
+- 容器: container
 
 ## ini 文本编译为二进制
 - 版本设计与构想            
