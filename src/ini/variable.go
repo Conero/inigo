@@ -9,8 +9,8 @@ package ini
 // 系统常量
 const (
 	AUTHOR    = "Joshua Conero" // @author 作者
-	VERSION   = "1.1.0"         // @version	版本号
-	BUILD     = "20171111"      // @build 发布日期
+	VERSION   = "1.2.0"         // @version	版本号
+	BUILD     = "20180710"      // @build 发布日期
 	NAME      = "go ini 文件解析库"  // @name 名称
 	START     = "20171028"      // @start 开始时间
 	COPYRIGHT = "@Conero"       // @copyright 版权

@@ -7,8 +7,6 @@
 package ini
 
 import (
-	"bufio"
-	"os"
 	"strconv"
 	"strings"
 	"regexp"
@@ -41,50 +39,33 @@ func Open(name string) *Ini {
 }
 
 // 私有方法，文件读取
+
 func (I *Ini) reader() {
 	if len(I.FileName) > 0 {
-		fs, err := os.Open(I.FileName)
-		if err == nil {
-			I.IsSuccess = true
-			I.parseFile(fs)
-		} else {
-			I.FailMsg = err.Error()
-		}
-	}
-}
-
-// 解析文件
-func (I *Ini) parseFile(fs *os.File) {
-	buf := bufio.NewReader(fs)
-	bba := BBAnalyze(I)
-	for {
-		line, err := buf.ReadString('\n')
-		// 程序跳转前检测是否出错，出错直接中断循环，避免还没有检查错误时便继续进入循环(死循环)
-		// -(2017年4月24日)新增的问题，最后一行还未完成时并提前结束
-		isPanicError := false
-		if err != nil {
-			isPanicError = true
-		}
-		line = strings.TrimSpace(line)
-		I.File.countLine()
-		// 非错误
-		//if !isPanicError {
+		ln := NewLnRer(I.FileName)
+		// 行扫描
+		bba := BBAnalyze(I)
+		I.IsSuccess = ln.Scan(func(line string) {
+			line = strings.TrimSpace(line)
+			I.File.countLine()
+			// 非错误
+			//if !isPanicError {
 			// 空行
 			if len(line) == 0 {
-				continue
+				return
 			}
 			// 多行注释
 			if I.isMultiComment(line) {
-				continue
+				return
 			}
 			// 单行注释
 			if I.isComment(line) {
-				continue
+				return
 			}
 			// 键值结束
 			if line == IniParseSettings["scope2"] {
 				bba.CommitQueue()
-				continue
+				return
 			}
 			line = I.transComment(line, false)
 			regCmt := regexp.MustCompile(IniParseSettings["reg_has_comment"])
@@ -96,7 +77,7 @@ func (I *Ini) parseFile(fs *os.File) {
 			// 多行字符串/字符串数组
 			isMl, isEnd, mKey, mValue := I.mLineString(line)
 			if isMl {
-				continue
+				return
 			}
 			// 多行数组结束
 			if isEnd {
@@ -105,7 +86,7 @@ func (I *Ini) parseFile(fs *os.File) {
 				}else{
 					bba.MultiLineToArray(mValue)
 				}
-				continue
+				return
 			}
 
 			// 获取基键
@@ -113,21 +94,19 @@ func (I *Ini) parseFile(fs *os.File) {
 			//fmt.Println(isBK, BK, nLine, line)
 			if isBK { // 是基键
 				bba.UpdateBaseKey(BK)
-				continue
+				return
 			} else if BK != "" {
 				//bba.PushQueue(BK, nLine)
 				bba.PushQueue(BK, I.strToData(nLine))
 			} else {
 				bba.MultiLineToArray(nLine)
 			}
-			//fmt.Println(isBK, BK, nLine, line)
-		//}
-		//fmt.Println(I.strTransform(line))
-		if isPanicError {
-			break
+		})
+		if !I.IsSuccess{
+			I.FailMsg = ln.Error()
 		}
+		I.DataQueue = bba.DataQueue
 	}
-	I.DataQueue = bba.DataQueue
 }
 
 // 读取值

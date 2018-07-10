@@ -18,16 +18,16 @@
 
 
 ***目录说明***
-- pkg		程序包脚本
-	- ini	用于复杂 ini 文件结构解析， 支持map/array ， 以及map/array复合解析。自定义 ini 脚本语法，采用结构树分析法
-		- @20171028
-		- [详情](./doc/pkg-ini.md)
-	- rong  用于简单 ini 文件解析，支持 ini 文件标准
-		- @20171028
-		- [详情](./doc/pkg-rong.md)
-	- running 工具器， 时间运行跟踪
-		- @20171103
-		- [详情](./pkg/running/README.md)
+- src
+    - ini       ini 包		
+        - @20171028
+        	- [详情](./doc/pkg-ini.md)
+        - rong  用于简单 ini 文件解析，支持 ini 文件标准
+            - @20171028
+            - [详情](./doc/pkg-rong.md)
+        - running 工具器， 时间运行跟踪
+            - @20171103
+            - [详情](./pkg/running/README.md)
 - bin 		包测试以及调试
 
 ### pkg/ini
