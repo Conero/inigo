@@ -4,7 +4,7 @@
  * @ini 行处理
  */
 
-package ini
+package inigo
 
 import (
 	"regexp"

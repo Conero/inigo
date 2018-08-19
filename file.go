@@ -3,7 +3,7 @@
 * @2017年10月28日 星期六
 * @ini 文件相关信息
  */
-package ini
+package inigo
 
 import "strconv"
 

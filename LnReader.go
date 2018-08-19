@@ -2,7 +2,7 @@
 	LnReader 文件行阅读器
 	2018年7月10日 星期二
  */
-package ini
+package inigo
 
 import (
 	"os"

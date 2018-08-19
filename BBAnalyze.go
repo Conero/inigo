@@ -4,7 +4,7 @@
  * @ini 基枝分析模型   Base Branch Analyze(BBAnalyze)
  */
 
-package ini
+package inigo
 
 import (
 	"fmt"

@@ -4,7 +4,7 @@
  * @ini 的 DataQueue 转化为 json, 生成器
  */
 
-package ini
+package inigo
 
 import (
 	"strconv"

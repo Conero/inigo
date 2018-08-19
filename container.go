@@ -3,7 +3,7 @@
  * @2017年11月11日 星期六
  * @ini 容器
  */
-package ini
+package inigo
 
 // 容器结构体
 type Container struct {

@@ -4,7 +4,7 @@
 * @ini 文件解释器重写
  */
 
-package ini
+package inigo
 
 import (
 	"strconv"

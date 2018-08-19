@@ -4,7 +4,7 @@
  * @ini 变量列表
  */
 
-package ini
+package inigo
 
 // 系统常量
 const (
