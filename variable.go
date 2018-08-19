@@ -8,12 +8,12 @@ package inigo
 
 // 系统常量
 const (
-	AUTHOR    = "Joshua Conero" // @author 作者
-	VERSION   = "1.2.0"         // @version	版本号
-	BUILD     = "20180710"      // @build 发布日期
-	NAME      = "go ini 文件解析库"  // @name 名称
-	START     = "20171028"      // @start 开始时间
-	COPYRIGHT = "@Conero"       // @copyright 版权
+	Author    = "Joshua Conero"         // @author 作者
+	Version   = "2.0.0"                 // @version	版本号
+	Release   = "20180819"              // @build 发布日期
+	Description  = "ini parser for golang" // @name 名称
+	Since     = "20171028"              // @start 开始时间
+	Copyright = "@Conero"               // @copyright 版权
 )
 
 // ini-parse 设置
@@ -30,10 +30,10 @@ var IniParseSettings map[string]string = map[string]string{
 	"reg_section_sg": "(\\[)|(\\])",          // 章节标点符号处理
 	"reg_scope":      "\\{[^\\{^\\}]*\\}",    // 作用域开始于结束正则
 	//"reg_scope_sg": "$\\{[^\\{^\\}]*\\}^", // 单行作用域解析
-	"reg_scope_sg":  "^\\{.*\\}$", // 单行作用域解析
-	"mlstring":      `"|'`,        // 多行字符串
-	"reg_clear_mls": `"|'`,        // 清除多行字符串中的字符
-	"reg_has_comment": `#|;`,			// 注释二进制
+	"reg_scope_sg":    "^\\{.*\\}$", // 单行作用域解析
+	"mlstring":        `"|'`,        // 多行字符串
+	"reg_clear_mls":   `"|'`,        // 清除多行字符串中的字符
+	"reg_has_comment": `#|;`,        // 注释二进制
 	//"reg_is_mlstring":  `^[A-Za-z0-9_-]+[=\s]+("|').*[^"^']+$`, //	是多行字符正则开始,  否 key = "ttt" 是 key = " 888
 	"reg_is_mlstring":    `^[\w]+[=\s]+("|'){1}[^"']*$`, //	是多行字符正则开始,  否 key = "ttt" 是 key = " 888
 	"reg_is_mlstring_nk": `^["']{1}[^"'\,]+$`,           //	是多行字符正则开始（无键值 no key）  "|'
@@ -50,6 +50,7 @@ var TranStrMap map[string]string = map[string]string{
 	`\}`: "_R__BRACE",  // 右大括弧号
 	`\=`: "_JC__EQUAL", // 等于符号转移替代
 }
+
 // 转移字符解析
 // 注释符号
 var TranCommentMap map[string]string = map[string]string{

@@ -39,7 +39,7 @@ func MkCreator(queue map[string]interface{}) *Creator {
 func (crt *Creator) iniFilePreText() string {
 	return `
 ;	文档生成日期 = ` + time.Now().Format("2006-01-02 15:04:05") + `
-;	pkg/ini 包版本 = v` + VERSION + `(` + BUILD + `)
+;	pkg/ini 包版本 = v` + Version + `(` + Release + `)
 `
 }
 
