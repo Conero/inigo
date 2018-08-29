@@ -6,6 +6,10 @@
 
 package inigo
 
+const (
+	SupportNameIni = "ini"
+	SupportNameRong = "rong"
+)
 // 系统常量
 const (
 	Author    = "Joshua Conero"         // @author 作者
