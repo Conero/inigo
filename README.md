@@ -9,7 +9,18 @@
 - ``document`` 项目文档
 - ``v{n}`` 历史版本分支，历史保存
 
+## 设计
+
+- `Parser`		解析器**接口**
+  - `BaseParser`   默认*ini* 文件解析器
+  - `RongParser`   *rong* ini 文件解析器
+- `FileParser` 文件解析器**接口**
+- `StrParser` 字符串解析器**接口**
+
+
+
 ## 分支
+
 - v0.x 版本
 	- [详情](./doc/readme-v0.x.md)
 	- 开发周期： @20170119 - 20170424
