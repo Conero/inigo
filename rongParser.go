@@ -4,12 +4,11 @@ package inigo
 // @Author:  Joshua Conero
 // @Name:    rong 解析器
 
-
 type RongParser struct {
 	BaseParser
 }
 
 //
 func (p *RongParser) MoreToDo() string {
-	return `THERE MANY STHING NEED TO DO YET.`
+	return `THERE'RE MANY THINGS NEED TO DO YET.`
 }

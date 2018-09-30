@@ -7,17 +7,18 @@
 package inigo
 
 const (
-	SupportNameIni = "ini"
+	SupportNameIni  = "ini"
 	SupportNameRong = "rong"
 )
+
 // 系统常量
 const (
-	Author    = "Joshua Conero"         // @author 作者
-	Version   = "2.0.0"                 // @version	版本号
-	Release   = "20180819"              // @build 发布日期
-	Description  = "ini parser for golang" // @name 名称
-	Since     = "20171028"              // @start 开始时间
-	Copyright = "@Conero"               // @copyright 版权
+	Author      = "Joshua Conero"         // @author 作者
+	Version     = "2.0.10"                // @version	版本号
+	Release     = "20180930"              // @build 发布日期
+	Description = "ini parser for golang" // @name 名称
+	Since       = "20171028"              // @start 开始时间
+	Copyright   = "@Conero"               // @copyright 版权
 )
 
 // ini-parse 设置

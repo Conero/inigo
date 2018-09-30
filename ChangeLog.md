@@ -6,7 +6,45 @@
 
 
 
-## v2.0.x
+## v2.0
+
+### v2.0.10/180930
+
+> 设计调整
+
+  ```
+  设计: 
+  	1. BaseParser -> container		(继承)
+  				  -> Parser			(实现)
+  				  
+  	2. RongParser -> BaseParser     (继承)
+  ```
+
+> **package**
+
+
+- (调整) 将旧版中 *LnReader* 移到新版中
+
+- (优化) *NewParser* 函数的重写
+
+- (+) *新增`container` 抽象容器·，实现对容器中数据的获取以及设置*
+
+- `Parser`
+
+
+  - (+) *添加方法Section，用于获取有关section的参数*
+
+- `BaseParser`
+
+  - (+) *实现对基本ini文件语法的支持，完成对文件的解析，并且获取到数据*
+
+- `baseFileParse`
+
+
+  - (+) 添加 *base-ini* 文件的读取与解析
+
+
+
 
 ### v2.0.1/180819
 

@@ -9,7 +9,6 @@ import (
 // @Author:  Joshua Conero
 // @Name:    字符串解析器
 
-
 type StrParser interface {
 	Line() int
 	GetData() map[interface{}]interface{}
@@ -17,13 +16,13 @@ type StrParser interface {
 }
 
 // 字符串遍历行
-func str2lines(content string, callback func(line string))  {
+func str2lines(content string, callback func(line string)) {
 	buf := bufio.NewReader(strings.NewReader(content))
 	for {
 		line, err2 := buf.ReadString('\n')
 		callback(line)
 		// 错误
-		if err2 != nil{
+		if err2 != nil {
 			break
 		}
 	}

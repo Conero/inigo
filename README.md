@@ -29,7 +29,30 @@
 		v2.x (版本)	
     - 通过对 go 语言的学习重新库；v1.x中项目设计多数受其他语言的影响，完全按照go语言的风格。
 
+## 使用
+
+### 获取解析器
+
+```go
+// 获取默认解析器(BaseParser)
+ini := inigo.NewParser()
+
+rong := inigo.NewParser("rong")
+//或者
+rong2 := inigo.NewParser(map[string]interface{}{
+    "driver": "rong"
+})
+
+```
+
+
+
+
+
 ## v2.x (20180819 - )
+
+`v2.0 第二版本的初始版本，项目开发中。到 v2.1 将趋于稳定`
+
 ### 特性
 
 - 使用新的 *git* 管理方式；见 ``项目管理``

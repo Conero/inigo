@@ -4,28 +4,33 @@ package inigo
 // @Author:  Joshua Conero
 // @Name:    库主文件
 
-// opts map[string]string{}, driver
+// get new Parser
+// param format(single param)
+// 		opts map[string]string{}|string
+//			driver SupportNameRong SupportNameIni
+// default BaseParser
 func NewParser(params ...interface{}) Parser {
-	if params == nil{
+	var driver string
+	var opts map[string]interface{}
+	if params == nil {
 		return new(BaseParser)
-	}
-	opts := map[string]string{}
-	if params[0] != nil{
-		opts = params[0].(map[string]string)
-	}
-	driver := ""
-	if len(params) > 1{
-		driver = params[1].(string)
-	}else if tDrv, has := opts["driver"]; has{
-		driver = tDrv
+	} else if driverTmp, isStr := params[0].(string); isStr {
+		driver = driverTmp
+	} else if optsTmp, isOpt := params[0].(map[string]interface{}); isOpt {
+		opts = optsTmp
+		if driverTmp, isset := opts["driver"]; isset {
+			driver = driverTmp.(string)
+		}
 	}
 
 	switch driver {
 	case SupportNameRong:
 		return new(RongParser)
+	case SupportNameIni:
+		return new(BaseParser)
 	default:
 		return new(BaseParser)
 	}
-	
+
 	return nil
 }
