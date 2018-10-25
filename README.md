@@ -19,15 +19,88 @@
 
 
 
+
+
+### Base 解析器
+
+*支持基本的 ini 文件解析，和简单的扩展语法*
+
+
+
+> 支持类型
+
+------
+
+*与 go 语言特性紧密结合*
+
+```go
+bool
+b1 = true				// 不区分大小写
+b2 = false
+
+int
+i = 56
+
+float64
+f64 = 78.455
+
+string
+s1 = 字符串，无效引号
+s2 = '可使用单引号'
+s3 = "依赖可用双引号"
+
+array/slice
+// 单行数组
+inta = 1, 5, 4, 6, 7, 9
+floata = 7.54, 6.24, 74.24
+stra = tttt, kdjd, ddd
+stra2 = "ffff,fff", 'hhhh', ttt
+
+
+map
+// map[interface{}]interface{}
+m.name = map 数据类型处理
+m.78 = 5555
+
+```
+
+
+
+
+
+> 指定定义变量/引用值
+
+```ini
+; 定义变量
+$var = 85
+author = Joshua Conero
+
+
+str = "the var is : $var"     	; the var is : 85
+str2 = 'the var is : $var'     	; the var is : $var
+str3 = "the var is : &author"   ; the var is : Joshua Conero
+
+```
+
+
+
+
+
+
+
+
+
 ## 分支
 
 - v0.x 版本
-	- [详情](./doc/readme-v0.x.md)
-	- 开发周期： @20170119 - 20170424
-		v1.x 版本		(开发中)
-	- 开始： 20171028 -> 
-		v2.x (版本)	
+  - [详情](./doc/readme-v0.x.md)
+  - 开发周期： @20170119 - 20170424
+    v1.x 版本		(开发中)
+  - 开始： 20171028 -> 
+    v2.x (版本)	
     - 通过对 go 语言的学习重新库；v1.x中项目设计多数受其他语言的影响，完全按照go语言的风格。
+
+
 
 ## 使用
 
