@@ -22,10 +22,8 @@ type Parser interface {
 	//		2.     fun Section(format string) 			点操作
 	Section(params ...interface{}) interface{}
 
-
 	// 获取数据返回 nil
 	GetData() map[interface{}]interface{}
-
 
 	Set(key string, value interface{}) Parser
 
@@ -33,4 +31,8 @@ type Parser interface {
 	IsValid() bool
 	OpenFile(filename string) Parser
 	ReadStr(content string) Parser
+
+	// 保存到文件
+	Save() bool
+	SaveAsFile(filename string) bool
 }

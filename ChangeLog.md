@@ -8,6 +8,23 @@
 
 ## v2.0
 
+###v2.0.11/181105
+
+*初步实现，通过数据生成 ini 配置文件*
+
+> **package**
+
+`Parser`
+
+- (+) 添加方法 `Save() bool` 会覆盖源文件
+- (+) 添加方法 `SaveAsFile(filename string) bool` 使用当前多去的数据，生成新的文件
+
+`BaseParser`
+
+- (+) 实现`Parser` 中新增的方法
+
+
+
 ### v2.0.10/180930
 
 > 设计调整
@@ -32,16 +49,15 @@
 - `Parser`
 
 
-  - (+) *添加方法Section，用于获取有关section的参数*
+    - (+) *添加方法Section，用于获取有关section的参数*
 
 - `BaseParser`
-
   - (+) *实现对基本ini文件语法的支持，完成对文件的解析，并且获取到数据*
 
 - `baseFileParse`
 
 
-  - (+) 添加 *base-ini* 文件的读取与解析
+    - (+) 添加 *base-ini* 文件的读取与解析
 
 
 

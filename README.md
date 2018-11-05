@@ -104,6 +104,14 @@ str3 = "the var is : &author"   ; the var is : Joshua Conero
 
 ## 使用
 
+### 安装
+
+```ini
+# github
+$ go get -u  github.com/conero/inigo
+
+```
+
 ### 获取解析器
 
 ```go
