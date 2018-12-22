@@ -13,6 +13,12 @@
 
 
 
+## v2.1
+
+### 支持 Tomal 文件解析(<font color="red">Need</font>)
+
+
+
 ## v2.0
 
 ### inigo.Parse  search key(<font color="red">Need</font>)
