@@ -8,6 +8,18 @@
 
 ## v2.0
 
+### v2.0.12/181222 - alpha
+
+> Package
+
+- `inigo_test.go` 测试 `TestNewParser` 用于golang的标准进行优化测试代码
+
+- *文件重命令；使之更加容易编排查看*
+  - `baseParser` -> `parserBase` 
+  - `rongParser` -> `parserRong` 
+
+
+
 ### v2.0.11/181105
 
 *初步实现，通过数据生成 ini 配置文件*

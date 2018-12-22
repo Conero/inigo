@@ -10,6 +10,7 @@ type Parser interface {
 	HasKey(key string) bool
 
 	// 支持多级数据访问，获取元素数据
+	// 实际读取的原始数据为 map[string]string
 	Raw(key string) string
 
 	// 获取参数: key, value(nil), default
