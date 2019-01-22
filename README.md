@@ -14,6 +14,7 @@
 - `Parser`		解析器**接口**
   - `BaseParser`   默认*ini* 文件解析器
   - `RongParser`   *rong* ini 文件解析器
+  - `TomlParser`  `toml 文件解析的支持`
 - `FileParser` 文件解析器**接口**
 - `StrParser` 字符串解析器**接口**
 
