@@ -28,6 +28,8 @@ func NewParser(params ...interface{}) Parser {
 		return new(RongParser)
 	case SupportNameIni:
 		return new(BaseParser)
+	case SupportNameToml:
+		return new(TomlParser)
 	default:
 		return new(BaseParser)
 	}

@@ -9,6 +9,7 @@ package inigo
 const (
 	SupportNameIni  = "ini"
 	SupportNameRong = "rong"
+	SupportNameToml  = "toml"
 )
 
 // 系统常量
