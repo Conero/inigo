@@ -16,8 +16,8 @@ const (
 const (
 	Author      = "Joshua Conero" // @author 作者
 	Name        = "conero/inigo"
-	Version     = "2.0.11"                // @version	版本号
-	Release     = "20181105"              // @build 发布日期
+	Version     = "2.1.0-alpha.1"         // @version	版本号
+	Release     = "20190123"              // @build 发布日期
 	Description = "ini parser for golang" // @name 名称
 	Since       = "20171028"              // @start 开始时间
 	Copyright   = "@Conero"               // @copyright 版权
