@@ -30,13 +30,21 @@ func TestNewParser(t *testing.T) {
 }
 
 func TestNewParserRong(t *testing.T) {
-	rong := NewParser(nil, "rong")
+	rong := NewParser(nil, SupportNameRong)
 	fmt.Println(rong)
+	fmt.Println(rong.Driver())
+
+	if rong.Driver() != SupportNameRong{
+		t.Fatal("Driver 默认生成无效！")
+	}
 }
 
 func TestNewParserIni(t *testing.T) {
-	ini := NewParser(nil, "ini")
+	ini := NewParser(nil, SupportNameIni)
 	ini.Set("test", 8).
 		Set("name", "Full")
 	fmt.Println(ini)
+	if ini.Driver() != SupportNameIni{
+		t.Fatal("Driver 默认生成无效！")
+	}
 }

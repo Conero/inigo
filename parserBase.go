@@ -115,6 +115,10 @@ func (p *BaseParser) SaveAsFile(filename string) bool {
 	return successMk
 }
 
+// 获取驱动名称
+func (p BaseParser) Driver() string  {
+	return SupportNameIni
+}
 // =>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>(BaseStrParse)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // baseStrParse
 //

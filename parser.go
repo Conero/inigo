@@ -36,4 +36,5 @@ type Parser interface {
 	// 保存到文件
 	Save() bool
 	SaveAsFile(filename string) bool
+	Driver() string
 }

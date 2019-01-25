@@ -12,3 +12,9 @@ type TomlParser struct {
 func (p *TomlParser) MoreToDo() string {
 	return `THERE'RE MANY THINGS NEED TO DO YET.`
 }
+
+
+// 获取驱动名称
+func (p TomlParser) Driver() string  {
+	return SupportNameRong
+}

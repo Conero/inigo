@@ -12,3 +12,9 @@ type RongParser struct {
 func (p *RongParser) MoreToDo() string {
 	return `THERE'RE MANY THINGS NEED TO DO YET.`
 }
+
+
+// 获取驱动名称
+func (p RongParser) Driver() string  {
+	return SupportNameRong
+}

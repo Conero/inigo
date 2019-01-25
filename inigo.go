@@ -14,25 +14,33 @@ func NewParser(params ...interface{}) Parser {
 	var opts map[string]interface{}
 	if params == nil {
 		return new(BaseParser)
-	} else if driverTmp, isStr := params[0].(string); isStr {
-		driver = driverTmp
-	} else if optsTmp, isOpt := params[0].(map[string]interface{}); isOpt {
-		opts = optsTmp
-		if driverTmp, isset := opts["driver"]; isset {
-			driver = driverTmp.(string)
+	}else {
+		paramsLen := len(params)
+		if driverTmp, isStr := params[0].(string); isStr {
+			driver = driverTmp
+		}
+
+		if optsTmp, isOpt := params[0].(map[string]interface{}); isOpt && driver == "" {
+			opts = optsTmp
+			if driverTmp, isset := opts["driver"]; isset {
+				driver = driverTmp.(string)
+			}
+		}
+
+		if paramsLen > 1{
+			if driverTmp, isStr := params[1].(string); isStr {
+				driver = driverTmp
+			}
 		}
 	}
 
 	switch driver {
 	case SupportNameRong:
 		return new(RongParser)
-	case SupportNameIni:
-		return new(BaseParser)
 	case SupportNameToml:
 		return new(TomlParser)
 	default:
 		return new(BaseParser)
 	}
-
 	return nil
 }
