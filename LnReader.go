@@ -15,14 +15,14 @@ type LnReader struct {
 	error
 }
 
-// 启动阅读器
+// 实例阅读器
 func NewLnRer(filename string) *LnReader {
 	return &LnReader{
 		Filename: filename,
 	}
 }
 
-// 扫描
+// 行扫描
 func (ln *LnReader) Scan(callback func(line string)) bool {
 	fs, err := os.Open(ln.Filename)
 	if err == nil {

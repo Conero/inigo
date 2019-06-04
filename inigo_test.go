@@ -34,7 +34,7 @@ func TestNewParserRong(t *testing.T) {
 	fmt.Println(rong)
 	fmt.Println(rong.Driver())
 
-	if rong.Driver() != SupportNameRong{
+	if rong.Driver() != SupportNameRong {
 		t.Fatal("Driver 默认生成无效！")
 	}
 }
@@ -44,7 +44,7 @@ func TestNewParserIni(t *testing.T) {
 	ini.Set("test", 8).
 		Set("name", "Full")
 	fmt.Println(ini)
-	if ini.Driver() != SupportNameIni{
+	if ini.Driver() != SupportNameIni {
 		t.Fatal("Driver 默认生成无效！")
 	}
 }

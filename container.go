@@ -4,6 +4,7 @@ package inigo
 // @Author:  Joshua Conero
 // @Name:    抽象容器
 
+// 参数容器
 type container struct {
 	Data map[interface{}]interface{}
 }
@@ -16,18 +17,21 @@ func (c *container) GetData() map[interface{}]interface{} {
 	return c.Data
 }
 
+// 删除获取
 func (c *container) Get(key string) (bool, interface{}) {
 	data := c.GetData()
 	value, has := data[key]
 	return has, value
 }
 
+// 是否存在键值
 func (c *container) HasKey(key string) bool {
 	data := c.GetData()
 	_, has := data[key]
 	return has
 }
 
+// 容器值得获取/设置
 func (c *container) Value(params ...interface{}) interface{} {
 	// key, nil, def
 	if len(params) > 2 {
@@ -45,6 +49,7 @@ func (c *container) Value(params ...interface{}) interface{} {
 	return nil
 }
 
+// 设置容器参数
 func (c *container) Set(key string, value interface{}) *container {
 	c.GetData()
 	c.Data[key] = value

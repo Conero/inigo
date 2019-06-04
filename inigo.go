@@ -1,10 +1,11 @@
+// go 版的 ini 文件解析库
 package inigo
 
 // @Date：   2018/8/19 0019 10:58
 // @Author:  Joshua Conero
 // @Name:    库主文件
 
-// get new Parser
+// 实例化解析器
 // param format(single param)
 // 		opts map[string]string{}|string
 //			driver SupportNameRong SupportNameIni
@@ -14,7 +15,7 @@ func NewParser(params ...interface{}) Parser {
 	var opts map[string]interface{}
 	if params == nil {
 		return new(BaseParser)
-	}else {
+	} else {
 		paramsLen := len(params)
 		if driverTmp, isStr := params[0].(string); isStr {
 			driver = driverTmp
@@ -27,7 +28,7 @@ func NewParser(params ...interface{}) Parser {
 			}
 		}
 
-		if paramsLen > 1{
+		if paramsLen > 1 {
 			if driverTmp, isStr := params[1].(string); isStr {
 				driver = driverTmp
 			}

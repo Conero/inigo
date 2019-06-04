@@ -4,6 +4,7 @@ package inigo
 // @Author:  Joshua Conero
 // @Name:    解析器
 
+// ini 文件基本的解析器接口
 type Parser interface {
 	// 读取参数
 	Get(key string) (bool, interface{})
