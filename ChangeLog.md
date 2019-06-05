@@ -17,19 +17,24 @@
 > 基本概述
 
 - *搭建`toml`解析器的支持程序*
+
 - (优化) *根据 godoc 规范优化注释文本*
 
+- (优化) *更名 `container -> Container` 便于测试，使之设计得更加合理*
 
 
-`inigo`
+
+
+**inigo**
 
 - [修复] *inigo.NewParser 参数解析错误*
 
+- **Container**
+  - (+) *新方法 `GetDef` 使用简介的带默认参数的值获取*
 
-
-`Parser`
-
-- (+) *添加方法 `Driver() string` 用于获取当前的驱动名称；以及实现各个解析器的对应的方法*
+- **Parser**
+  - (+) *添加方法 `Driver() string` 用于获取当前的驱动名称；以及实现各个解析器的对应的方法*
+  - (+) *添加与 Container 对应的 GetDef 方法*
 
 
 

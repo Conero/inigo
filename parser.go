@@ -8,6 +8,7 @@ package inigo
 type Parser interface {
 	// 读取参数
 	Get(key string) (bool, interface{})
+	GetDef(key string, def interface{}) interface{}
 	HasKey(key string) bool
 
 	// 支持多级数据访问，获取元素数据

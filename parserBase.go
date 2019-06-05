@@ -22,7 +22,7 @@ const (
 type BaseParser struct {
 	valid   bool
 	section []string
-	container
+	Container
 	filename string // 文件名
 }
 
