@@ -17,11 +17,12 @@ type FileParser interface {
 
 // base 文件解析
 type baseFileParse struct {
-	line    int // 总行数
-	comment int // 注释行
-	equal   int // 等式行
-	data    map[interface{}]interface{}
-	section []string // 节
+	line    int                         // 总行数
+	comment int                         // 注释行
+	equal   int                         // 等式行
+	data    map[interface{}]interface{} // 解析以后的数据
+	rawData map[string]string           // 原始数据
+	section []string                    // 节
 }
 
 // 文件读取
@@ -29,6 +30,11 @@ func (p *baseFileParse) read(filename string) *baseFileParse {
 	if p.data == nil {
 		p.data = map[interface{}]interface{}{}
 	}
+
+	if p.rawData == nil {
+		p.rawData = map[string]string{}
+	}
+
 	if p.section == nil {
 		p.section = []string{}
 	}
@@ -83,6 +89,7 @@ func (p *baseFileParse) read(filename string) *baseFileParse {
 		} else {
 			p.data[key] = dd
 		}
+		p.rawData[key] = value
 	})
 
 	// section 加到 data 中

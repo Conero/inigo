@@ -23,13 +23,16 @@ type BaseParser struct {
 	valid   bool
 	section []string
 	Container
-	filename string // 文件名
+	filename  string            // 文件名
+	rawKvData map[string]string // 原始解析的参数
 }
 
 // 获取原始值，非解析后的
 func (p *BaseParser) Raw(key string) string {
-	raw := ""
-	// @TODO 待实现
+	var raw string
+	if v, has := p.rawKvData[key]; has {
+		raw = v
+	}
 	return raw
 }
 
@@ -85,6 +88,7 @@ func (p *BaseParser) OpenFile(filename string) Parser {
 	reader.read(filename)
 	p.Data = reader.GetData()
 	p.filename = filename
+	p.rawKvData = reader.rawData
 	return p
 }
 
@@ -124,6 +128,23 @@ func (p *BaseParser) SaveAsFile(filename string) bool {
 		successMk = false
 	}
 	return successMk
+}
+
+//---------------------------- 来自 Container 对象的方法重写 -------------------------
+
+// 只获取
+func (p *BaseParser) Get(key string) (bool, interface{}) {
+	return p.Container.Get(key)
+}
+
+// 带默认值得值获取
+func (p *BaseParser) GetDef(key string, def interface{}) interface{} {
+	return p.Container.GetDef(key, def)
+}
+
+// 带默认值得值获取
+func (p *BaseParser) HasKey(key string) bool {
+	return p.Container.HasKey(key)
 }
 
 // 当前项目获取驱动名称

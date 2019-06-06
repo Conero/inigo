@@ -4,12 +4,13 @@ package inigo
 // @Author:  Joshua Conero
 // @Name:    抽象容器
 
-// 参数容器
+// 抽象参数容器
 type Container struct {
 	Data map[interface{}]interface{}
 }
 
 // data 数据检测
+// 获取容器的全部数据，并且可实例化数据
 func (c *Container) GetData() map[interface{}]interface{} {
 	if c.Data == nil {
 		c.Data = map[interface{}]interface{}{}
@@ -18,25 +19,28 @@ func (c *Container) GetData() map[interface{}]interface{} {
 }
 
 // 获取值
-func (c *Container) Get(key string) (bool, interface{}) {
+func (c *Container) Get(key interface{}) (bool, interface{}) {
 	data := c.GetData()
 	value, has := data[key]
 	return has, value
 }
 
 // 获取值，且含默认值
-func (c *Container) GetDef(key string, def interface{}) interface{} {
+func (c *Container) GetDef(key interface{}, def interface{}) interface{} {
 	return c.Value(key, nil, def)
 }
 
 // 是否存在键值
-func (c *Container) HasKey(key string) bool {
+func (c *Container) HasKey(key interface{}) bool {
 	data := c.GetData()
 	_, has := data[key]
 	return has
 }
 
 // 容器值得获取/设置
+// Container.Value(key interface{})  			获取数据
+// Container.Value(key, value interface{})  	设置数据
+// Container.Value(key, nil, def interface{})  	获取值并带参数，可使用新的方法 c.GetDef(key, def interface{})
 func (c *Container) Value(params ...interface{}) interface{} {
 	// key, nil, def
 	if len(params) > 2 {
@@ -55,8 +59,31 @@ func (c *Container) Value(params ...interface{}) interface{} {
 }
 
 // 设置容器参数
-func (c *Container) Set(key string, value interface{}) *Container {
+func (c *Container) Set(key, value interface{}) *Container {
 	c.GetData()
 	c.Data[key] = value
+	return c
+}
+
+// 删除容器的值
+func (c *Container) Del(key interface{}) bool {
+	if c.HasKey(key) {
+		delete(c.Data, key)
+		return true
+	}
+	return false
+}
+
+// 数据合并
+func (c *Container) Merge(data map[interface{}]interface{}) *Container {
+	for k, v := range data {
+		c.Set(k, v)
+	}
+	return c
+}
+
+// 重置容器的值
+func (c *Container) Reset() *Container {
+	c.Data = map[interface{}]interface{}{}
 	return c
 }
