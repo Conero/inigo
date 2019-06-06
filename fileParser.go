@@ -23,6 +23,7 @@ type baseFileParse struct {
 	data    map[interface{}]interface{} // 解析以后的数据
 	rawData map[string]string           // 原始数据
 	section []string                    // 节
+	err     error                       // 错误信息
 }
 
 // 文件读取
@@ -96,6 +97,9 @@ func (p *baseFileParse) read(filename string) *baseFileParse {
 	if isSecMk {
 		p.data[baseSecRegPref+section] = secTmpDd
 	}
+
+	// 错误信息
+	p.err = ln.error
 
 	return p
 }

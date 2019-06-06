@@ -34,6 +34,7 @@ type Parser interface {
 	IsValid() bool
 	OpenFile(filename string) Parser
 	ReadStr(content string) Parser
+	ErrorMsg() string // 错误信息
 
 	// 保存到文件
 	Save() bool

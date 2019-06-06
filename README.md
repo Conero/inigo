@@ -80,7 +80,6 @@ author = Joshua Conero
 str = "the var is : $var"     	; the var is : 85
 str2 = 'the var is : $var'     	; the var is : $var
 str3 = "the var is : &author"   ; the var is : Joshua Conero
-
 ```
 
 

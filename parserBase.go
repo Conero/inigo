@@ -25,6 +25,7 @@ type BaseParser struct {
 	Container
 	filename  string            // 文件名
 	rawKvData map[string]string // 原始解析的参数
+	errorMsg  string            // 错误信息
 }
 
 // 获取原始值，非解析后的
@@ -89,6 +90,11 @@ func (p *BaseParser) OpenFile(filename string) Parser {
 	p.Data = reader.GetData()
 	p.filename = filename
 	p.rawKvData = reader.rawData
+	p.valid = true
+	if reader.err != nil {
+		p.errorMsg = reader.err.Error()
+		p.valid = false
+	}
 	return p
 }
 
@@ -145,6 +151,11 @@ func (p *BaseParser) GetDef(key string, def interface{}) interface{} {
 // 带默认值得值获取
 func (p *BaseParser) HasKey(key string) bool {
 	return p.Container.HasKey(key)
+}
+
+// 错误错误信息
+func (p *BaseParser) ErrorMsg() string {
+	return p.errorMsg
 }
 
 // 当前项目获取驱动名称
