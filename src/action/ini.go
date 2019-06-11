@@ -7,6 +7,7 @@ import (
 	"github.com/conero/inigo"
 	"github.com/conero/uymas/bin"
 	"github.com/conero/uymas/fs"
+	"github.com/conero/uymas/util"
 	"os"
 	"path"
 	"regexp"
@@ -30,9 +31,9 @@ func (a *IniAction) Run() {
 	input := bufio.NewScanner(os.Stdin)
 	// 文本输入前缀
 	fmt.Print("$ ")
-	helper := &iniHelper{
-		resource: map[string]inigo.Parser{},
-	}
+	helper := &iniHelper{}
+	// 初始化
+	helper.oIRQueueManger.init()
 	// 输入扫描
 	for input.Scan() {
 		text := input.Text()
@@ -47,14 +48,83 @@ func (a *IniAction) Run() {
 	}
 }
 
+// 唯一键： filename, name|alias
+// ini 文件打开资源
+// 用于缓存数据
+type openIniResource struct {
+	ini      inigo.Parser
+	useTime  string // 花费时间
+	name     string // 加载的文件命名
+	alias    string // 别名
+	filename string // 文件名称
+
+}
+
+// oIRQueue 管理器
+type oIRQueueManger struct {
+	oIR      []openIniResource
+	curIdx   int    // 当前的索引
+	curFname string // 当前所属文件名
+	curName  string // 当前显示文件名
+}
+
+// 初始化
+func (oq *oIRQueueManger) init() {
+	if oq.oIR == nil {
+		oq.oIR = []openIniResource{}
+	}
+}
+
+// filename, name(alias) 的唯一性判断
+func (oq *oIRQueueManger) hasQueue(filename, name string) bool {
+	exist := false
+	for _, q := range oq.oIR {
+		if filename == q.filename {
+			if q.alias != "" && name == q.alias {
+				exist = true
+				break
+			} else if q.alias == "" && name == q.name {
+				exist = true
+				break
+			}
+		}
+	}
+	return exist
+}
+
+// 获取的数据
+func (op *oIRQueueManger) hasAndChangeByName(name string) bool {
+	success := false
+	for i, q := range op.oIR {
+		if q.alias == name {
+			success = true
+		} else if q.name == name {
+			success = true
+		} else if fmt.Sprintf("%v%v", q.name, i) == name {
+			success = true
+		}
+		if success {
+			op.curName = q.name
+			op.curFname = q.filename
+			op.curIdx = i
+			break
+		}
+	}
+	return success
+}
+
+// @TODO needTodos 实现 $ open 不受相同文件名影响；支持别名/文件名 等唯一性不同区分
+
 // 交互类
 // ini 助手
 type iniHelper struct {
-	text     string
-	cmds     []string
-	xa       *bin.App
-	resource map[string]inigo.Parser // ini 资源集合
-	curName  string                  // 当前的 ini 文件
+	text string
+	cmds []string
+	xa   *bin.App
+	//resource map[string]inigo.Parser // ini 资源集合
+	//resource oIRQueue // ini 资源集合
+	oIRQueueManger
+	curName string // 当前的 ini 文件
 }
 
 // 初始化
@@ -112,6 +182,7 @@ func (h *iniHelper) cmdOpen() {
 	filename := xa.Next(xa.Command)
 	filename = fs.StdPathName(filename)
 	if filename != "" {
+		rtMk := util.SecCallStr()
 		ini := inigo.NewParser()
 		ini.OpenFile(filename)
 		if !ini.IsValid() {
@@ -126,9 +197,22 @@ func (h *iniHelper) cmdOpen() {
 				name = strings.Join(nameQue[0:vLen-1], ".")
 			}
 			h.curName = name
-			h.resource[name] = ini
+			if h.oIRQueueManger.hasQueue(filename, name) {
+				// 已经存在
+			} else {
+				// 不存在，则新建
+				h.oIRQueueManger.oIR = append(h.oIRQueueManger.oIR, openIniResource{
+					filename: filename,
+					name:     name,
+					ini:      ini,
+				})
+				h.oIRQueueManger.curName = name
+				h.oIRQueueManger.curFname = filename
+				h.oIRQueueManger.curIdx = len(h.oIRQueueManger.oIR) - 1
+			}
 
 			h.output(filename + "文件加载成功！")
+			h.output("用时： " + rtMk())
 		}
 	} else {
 		h.output("参数错误， 参考: $ open <filename>")
@@ -140,10 +224,10 @@ func (h *iniHelper) cmdUse() {
 	xa := h.xa
 	name := xa.Next(xa.Command)
 	if name != "" {
-		if name == h.curName {
+		if name == h.oIRQueueManger.curName {
 			h.output("您已经选择了 " + name)
 		} else {
-			if _, has := h.resource[name]; has {
+			if h.oIRQueueManger.hasAndChangeByName(name) {
 				h.curName = name
 			} else {
 				h.output(name + " 不存在")
