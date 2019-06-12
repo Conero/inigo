@@ -7,8 +7,8 @@ package vars
  **/
 
 const (
-	Version = "0.1.0"
-	Release = "20190606"
+	Version = "0.2.0-alpha"
+	Release = "20190612"
 	Since   = "2019-6-6 11:22:51"
 	Code    = "Susanna Conero"
 	Name    = "inigo cli"

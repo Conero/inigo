@@ -113,6 +113,30 @@ func (op *oIRQueueManger) hasAndChangeByName(name string) bool {
 	return success
 }
 
+// 获取 ini
+func (op *oIRQueueManger) getCurIni() inigo.Parser {
+	var ini inigo.Parser = nil
+	if op.curIdx > -1 {
+		p := op.oIR[op.curIdx]
+		ini = p.ini
+	}
+	return ini
+}
+
+// 获取用户列表
+func (op *oIRQueueManger) getNameList() []interface{} {
+	queue := []interface{}{}
+	for _, p := range op.oIR {
+		name := p.name
+		if p.alias != "" {
+			name = p.alias
+		}
+		queue = append(queue, name)
+	}
+
+	return queue
+}
+
 // @TODO needTodos 实现 $ open 不受相同文件名影响；支持别名/文件名 等唯一性不同区分
 
 // 交互类
@@ -191,21 +215,32 @@ func (h *iniHelper) cmdOpen() {
 			)
 		} else {
 			_, name := path.Split(filename)
+			h.curName = name
+			alias := ""
+			if vAlias, exist := h.xa.Data["alias"]; exist {
+				alias = vAlias.(string)
+				h.curName = alias
+			}
 			nameQue := strings.Split(name, ".")
 			vLen := len(nameQue)
 			if vLen > 1 {
 				name = strings.Join(nameQue[0:vLen-1], ".")
 			}
-			h.curName = name
+
 			if h.oIRQueueManger.hasQueue(filename, name) {
 				// 已经存在
 			} else {
 				// 不存在，则新建
-				h.oIRQueueManger.oIR = append(h.oIRQueueManger.oIR, openIniResource{
+
+				oIr := openIniResource{
 					filename: filename,
 					name:     name,
 					ini:      ini,
-				})
+				}
+				if alias != "" {
+					oIr.alias = alias
+				}
+				h.oIRQueueManger.oIR = append(h.oIRQueueManger.oIR, oIr)
 				h.oIRQueueManger.curName = name
 				h.oIRQueueManger.curFname = filename
 				h.oIRQueueManger.curIdx = len(h.oIRQueueManger.oIR) - 1
@@ -240,10 +275,7 @@ func (h *iniHelper) cmdUse() {
 
 // 打印是资源列表
 func (h *iniHelper) cmdList() {
-	queue := []interface{}{}
-	for k, _ := range h.resource {
-		queue = append(queue, k)
-	}
+	queue := h.oIRQueueManger.getNameList()
 	h.output("资源列表如下：")
 	fmt.Println(bin.FormatQue(queue))
 }
@@ -263,15 +295,13 @@ func (h *iniHelper) cmdGet() {
 	xa := h.xa
 	key := xa.Next(xa.Command)
 	if key != "" {
-		curName := h.curName
-		if curName != "" {
-			if rs, has := h.resource[curName]; has {
-				if exist, v := rs.Get(key); exist {
-					h.output(fmt.Sprintf("%v", v))
-				} else {
-					h.output("键值获取错误",
-						"键值 "+key+" 不存在")
-				}
+		ini := h.oIRQueueManger.getCurIni()
+		if ini != nil {
+			if exist, v := ini.Get(key); exist {
+				h.output(fmt.Sprintf("%v", v))
+			} else {
+				h.output("键值获取错误",
+					"键值 "+key+" 不存在")
 			}
 		} else {
 			h.output("键值获取错误",
