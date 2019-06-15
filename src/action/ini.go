@@ -62,76 +62,22 @@ type openIniResource struct {
 
 // oIRQueue 管理器
 type oIRQueueManger struct {
-	oIR      []openIniResource
-	curIdx   int    // 当前的索引
-	curFname string // 当前所属文件名
-	curName  string // 当前显示文件名
+	oIR    map[string]openIniResource
+	curKey string // 当前的唯一键值
 }
 
 // 初始化
 func (oq *oIRQueueManger) init() {
 	if oq.oIR == nil {
-		oq.oIR = []openIniResource{}
+		oq.oIR = map[string]openIniResource{}
 	}
-}
-
-// filename, name(alias) 的唯一性判断
-func (oq *oIRQueueManger) hasQueue(filename, name string) bool {
-	exist := false
-	for _, q := range oq.oIR {
-		if filename == q.filename {
-			if q.alias != "" && name == q.alias {
-				exist = true
-				break
-			} else if q.alias == "" && name == q.name {
-				exist = true
-				break
-			}
-		}
-	}
-	return exist
-}
-
-// 获取的数据
-func (op *oIRQueueManger) hasAndChangeByName(name string) bool {
-	success := false
-	for i, q := range op.oIR {
-		if q.alias == name {
-			success = true
-		} else if q.name == name {
-			success = true
-		} else if fmt.Sprintf("%v%v", q.name, i) == name {
-			success = true
-		}
-		if success {
-			op.curName = q.name
-			op.curFname = q.filename
-			op.curIdx = i
-			break
-		}
-	}
-	return success
-}
-
-// 获取 ini
-func (op *oIRQueueManger) getCurIni() inigo.Parser {
-	var ini inigo.Parser = nil
-	if op.curIdx > -1 {
-		p := op.oIR[op.curIdx]
-		ini = p.ini
-	}
-	return ini
 }
 
 // 获取用户列表
 func (op *oIRQueueManger) getNameList() []interface{} {
 	queue := []interface{}{}
-	for _, p := range op.oIR {
-		name := p.name
-		if p.alias != "" {
-			name = p.alias
-		}
-		queue = append(queue, name)
+	for k, _ := range op.oIR {
+		queue = append(queue, k)
 	}
 
 	return queue
@@ -148,7 +94,6 @@ type iniHelper struct {
 	//resource map[string]inigo.Parser // ini 资源集合
 	//resource oIRQueue // ini 资源集合
 	oIRQueueManger
-	curName string // 当前的 ini 文件
 }
 
 // 初始化
@@ -168,7 +113,7 @@ func (h *iniHelper) init(text string) {
 func (h *iniHelper) output(params ...string) {
 	br := "\r\n"
 	outs := "" +
-		h.curName + ">>" + br
+		h.curKey + ">>" + br
 
 	for _, s := range params {
 		if s == "" {
@@ -214,36 +159,29 @@ func (h *iniHelper) cmdOpen() {
 				"文件："+filename,
 			)
 		} else {
-			_, name := path.Split(filename)
-			h.curName = name
-			alias := ""
+			// 获取键值
+			_, vkey := path.Split(filename)
 			if vAlias, exist := h.xa.Data["alias"]; exist {
-				alias = vAlias.(string)
-				h.curName = alias
-			}
-			nameQue := strings.Split(name, ".")
-			vLen := len(nameQue)
-			if vLen > 1 {
-				name = strings.Join(nameQue[0:vLen-1], ".")
+				vkey = vAlias.(string)
+			} else {
+				nameQue := strings.Split(vkey, ".")
+				vLen := len(nameQue)
+				if vLen > 1 {
+					vkey = strings.Join(nameQue[0:vLen-1], ".")
+				}
 			}
 
-			if h.oIRQueueManger.hasQueue(filename, name) {
+			if _, keyExist := h.oIR[vkey]; keyExist {
 				// 已经存在
+				// @TODO 存在时可以采用询问的方式继续或者类似 `--force` 强制性执行的参数
 			} else {
 				// 不存在，则新建
-
 				oIr := openIniResource{
 					filename: filename,
-					name:     name,
 					ini:      ini,
 				}
-				if alias != "" {
-					oIr.alias = alias
-				}
-				h.oIRQueueManger.oIR = append(h.oIRQueueManger.oIR, oIr)
-				h.oIRQueueManger.curName = name
-				h.oIRQueueManger.curFname = filename
-				h.oIRQueueManger.curIdx = len(h.oIRQueueManger.oIR) - 1
+				h.oIRQueueManger.oIR[vkey] = oIr
+				h.oIRQueueManger.curKey = vkey
 			}
 
 			h.output(filename + "文件加载成功！")
@@ -259,11 +197,11 @@ func (h *iniHelper) cmdUse() {
 	xa := h.xa
 	name := xa.Next(xa.Command)
 	if name != "" {
-		if name == h.oIRQueueManger.curName {
+		if name == h.oIRQueueManger.curKey {
 			h.output("您已经选择了 " + name)
 		} else {
-			if h.oIRQueueManger.hasAndChangeByName(name) {
-				h.curName = name
+			if _, exist := h.oIRQueueManger.oIR[name]; exist {
+				h.oIRQueueManger.curKey = name
 			} else {
 				h.output(name + " 不存在")
 			}
@@ -282,7 +220,7 @@ func (h *iniHelper) cmdList() {
 
 // 显示帮助信息
 func (h *iniHelper) cmdHelp() {
-	h.output("ini文件加载测试器",
+	h.output("$ ini 交互式文件加载测试命令集合：",
 		"open <filename>   打开并加载 ini 文件",
 		"use <name>        切换已经打开的资源",
 		"list              列出全部的可用资源",
@@ -295,8 +233,8 @@ func (h *iniHelper) cmdGet() {
 	xa := h.xa
 	key := xa.Next(xa.Command)
 	if key != "" {
-		ini := h.oIRQueueManger.getCurIni()
-		if ini != nil {
+		if rs, exist := h.oIRQueueManger.oIR[key]; exist {
+			ini := rs.ini
 			if exist, v := ini.Get(key); exist {
 				h.output(fmt.Sprintf("%v", v))
 			} else {
