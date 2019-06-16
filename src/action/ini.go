@@ -134,12 +134,15 @@ func (h *iniHelper) router() {
 	h.xa = bin.GetApp()
 
 	// 命令接口
-	bin.RegisterFunc("open", h.cmdOpen)
-	bin.RegisterFunc("use", h.cmdUse)
-	bin.RegisterFunc("list", h.cmdList)
-	bin.RegisterFunc("get", h.cmdGet)
-	bin.RegisterFunc("help", h.cmdHelp)
-	bin.RegisterFunc("about", h.cmdAbout)
+	bin.RegisterFunc("open", h.cmdOpen)   // 打开资源
+	bin.RegisterFunc("new", h.cmdNew)     // 新增资源
+	bin.RegisterFunc("use", h.cmdUse)     // 资源切换
+	bin.RegisterFunc("list", h.cmdList)   // 获取资源礼列表
+	bin.RegisterFunc("get", h.cmdGet)     // 获取资源中的值
+	bin.RegisterFunc("help", h.cmdHelp)   // 获取的帮助信息
+	bin.RegisterFunc("about", h.cmdAbout) // 查询资源信息
+	bin.RegisterFunc("set", h.cmdSet)     // 资源值新增或设置
+	bin.RegisterFunc("save", h.cmdSave)   // 保存新的资源/或者新文件
 
 	bin.EmptyFunc(h.cmdEmpty)
 	bin.UnfindFunc(h.cmdUnfind)
@@ -195,6 +198,27 @@ func (h *iniHelper) cmdOpen() {
 	}
 }
 
+// 新增空的资源
+func (h *iniHelper) cmdNew() {
+	rtMk := util.SecCallStr()
+	xa := h.xa
+	name := xa.Next(xa.Command)
+	if name != "" {
+		if _, exist := h.oIR[name]; exist {
+			h.output("[" + name + "] 资源已经存在，无法新增对应的资源")
+		} else {
+			newRs := openIniResource{
+				ini:     inigo.NewParser(),
+				useTime: rtMk(),
+			}
+			h.oIR[name] = newRs
+			h.curKey = name
+		}
+	} else {
+		h.output("新资源错误，格式有误：$ new <name>")
+	}
+}
+
 // 使用 ini 资源
 func (h *iniHelper) cmdUse() {
 	xa := h.xa
@@ -225,11 +249,15 @@ func (h *iniHelper) cmdList() {
 // 显示帮助信息
 func (h *iniHelper) cmdHelp() {
 	h.output("$ ini 交互式文件加载测试命令集合：",
-		"open <filename>   打开并加载 ini 文件",
-		"use <name>        切换已经打开的资源",
-		"list              列出全部的可用资源",
-		"get <key>         获取键值",
-		"exit              退出对话框",
+		"open <filename>      打开并加载 ini 文件",
+		"new <name>           创建空的资源",
+		"use <name>           切换已经打开的资源",
+		"list                 列出全部的可用资源",
+		"get <key>            获取键值",
+		"set <key> [<value>]  设置/更新当前的资源，value不设置是为空值",
+		"save [<filename>]    保存当前的资源，空资源必须设置文件名；反正可能覆盖资源文件",
+		"about [<name>]       打印当前的资源写信息",
+		"exit                 退出对话框",
 	)
 }
 
@@ -259,6 +287,51 @@ func (h *iniHelper) cmdGet() {
 	} else {
 		h.output("键值获取错误",
 			"清楚参数有误: get <key> ")
+	}
+}
+
+// 资源值更新
+func (h *iniHelper) cmdSet() {
+	curKey := h.curKey
+	if curKey != "" {
+		xa := h.xa
+		key := xa.Next(xa.Command)
+		value := xa.Next(key)
+
+		if key == "" {
+			h.output("参数设置失败，格式有误: $ set <key> [<value>]")
+		} else {
+			rs := h.oIR[curKey]
+			rs.ini.Set(key, value)
+			h.output("设置值成功！")
+		}
+	} else {
+		h.output("参数设置失败，当前还没有任何资源！")
+	}
+}
+
+// 资源保存为新文件
+func (h *iniHelper) cmdSave() {
+	curKey := h.curKey
+	if curKey != "" {
+		xa := h.xa
+		filename := xa.Next(xa.Command)
+		curRs := h.oIR[curKey]
+
+		if curRs.filename != "" {
+			// 保存当前文件
+			if filename == "" {
+				curRs.ini.Save()
+			} else {
+				curRs.ini.SaveAsFile(filename)
+			}
+		} else if filename != "" {
+			curRs.ini.SaveAsFile(filename)
+		} else {
+			h.output("保存失败，参数无效！")
+		}
+	} else {
+		h.output("当前没有任何资源，资源保存失败")
 	}
 }
 
