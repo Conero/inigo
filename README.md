@@ -17,5 +17,9 @@ $ ini
 # 打开/读取 ini 文件
 # 打开相同的文件名；显示名称为：
 $ open <filename> --alias=<alias>		alias 为可选别名
+
+# 打印项目加载以及基本信息
+# name 为可选，不选择是默认为当前的的资源
+$ about [<name>]
 ```
 

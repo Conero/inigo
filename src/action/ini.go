@@ -139,6 +139,8 @@ func (h *iniHelper) router() {
 	bin.RegisterFunc("list", h.cmdList)
 	bin.RegisterFunc("get", h.cmdGet)
 	bin.RegisterFunc("help", h.cmdHelp)
+	bin.RegisterFunc("about", h.cmdAbout)
+
 	bin.EmptyFunc(h.cmdEmpty)
 	bin.UnfindFunc(h.cmdUnfind)
 
@@ -179,13 +181,14 @@ func (h *iniHelper) cmdOpen() {
 				oIr := openIniResource{
 					filename: filename,
 					ini:      ini,
+					useTime:  rtMk(),
 				}
 				h.oIRQueueManger.oIR[vkey] = oIr
 				h.oIRQueueManger.curKey = vkey
 			}
 
-			h.output(filename + "文件加载成功！")
-			h.output("用时： " + rtMk())
+			h.output(filename+"文件加载成功！",
+				"用时： "+rtMk())
 		}
 	} else {
 		h.output("参数错误， 参考: $ open <filename>")
@@ -202,6 +205,7 @@ func (h *iniHelper) cmdUse() {
 		} else {
 			if _, exist := h.oIRQueueManger.oIR[name]; exist {
 				h.oIRQueueManger.curKey = name
+				h.output(name + " 切换成功！")
 			} else {
 				h.output(name + " 不存在")
 			}
@@ -229,11 +233,18 @@ func (h *iniHelper) cmdHelp() {
 	)
 }
 
+// 键值获取
 func (h *iniHelper) cmdGet() {
 	xa := h.xa
 	key := xa.Next(xa.Command)
+	curKey := h.curKey
+	if curKey == "" {
+		h.output("当前还没有加载任何资源，请示先使用 open 打开资源")
+		return
+	}
+
 	if key != "" {
-		if rs, exist := h.oIRQueueManger.oIR[key]; exist {
+		if rs, exist := h.oIRQueueManger.oIR[curKey]; exist {
 			ini := rs.ini
 			if exist, v := ini.Get(key); exist {
 				h.output(fmt.Sprintf("%v", v))
@@ -249,6 +260,31 @@ func (h *iniHelper) cmdGet() {
 		h.output("键值获取错误",
 			"清楚参数有误: get <key> ")
 	}
+}
+
+// 答应当前的资源
+func (h *iniHelper) cmdAbout() {
+	// 获取键值
+	xa := h.xa
+	key := xa.Next(xa.Command)
+	if key == "" {
+		key = h.oIRQueueManger.curKey
+	}
+
+	// 打印
+	if key == "" {
+		h.output("参数错误或者当前未加载任何资源，无法获取任何资源")
+	} else {
+		rs, exist := h.oIRQueueManger.oIR[key]
+		if !exist {
+			h.output("[" + key + "] 资源不存在")
+		} else {
+			h.output("["+key+"] 信息如下：",
+				"加载用时    "+rs.useTime,
+				"文件命令    "+rs.filename)
+		}
+	}
+
 }
 
 // 命令
