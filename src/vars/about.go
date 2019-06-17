@@ -7,7 +7,7 @@ package vars
  **/
 
 const (
-	Version = "0.2.0-alpha"
+	Version = "0.2.0"
 	Release = "20190617"
 	Since   = "2019-06-06 11:22:51"
 	Code    = "Susanna Conero"

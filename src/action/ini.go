@@ -169,11 +169,12 @@ func (h *iniHelper) router() {
 	h.xa = bin.GetApp()
 
 	// 命令接口
-	bin.RegisterFunc("open", h.cmdOpen)   // 打开资源
-	bin.RegisterFunc("new", h.cmdNew)     // 新增资源
-	bin.RegisterFunc("use", h.cmdUse)     // 资源切换
-	bin.RegisterFunc("list", h.cmdList)   // 获取资源礼列表
-	bin.RegisterFunc("get", h.cmdGet)     // 获取资源中的值
+	bin.RegisterFunc("open", h.cmdOpen) // 打开资源
+	bin.RegisterFunc("new", h.cmdNew)   // 新增资源
+	bin.RegisterFunc("use", h.cmdUse)   // 资源切换
+	bin.RegisterFunc("list", h.cmdList) // 获取资源礼列表
+	bin.RegisterFunc("get", h.cmdGet)   // 获取资源中的值
+	bin.RegisterFunc("dump", h.cmdDump)
 	bin.RegisterFunc("help", h.cmdHelp)   // 获取的帮助信息
 	bin.RegisterFunc("about", h.cmdAbout) // 查询资源信息
 	bin.RegisterFunc("set", h.cmdSet)     // 资源值新增或设置
@@ -291,6 +292,7 @@ func (h *iniHelper) cmdHelp() {
 		"use <name>           切换已经打开的资源",
 		"list                 列出全部的可用资源",
 		"get <key>            获取键值",
+		"dump <key>           打印键值的类型以及值",
 		"set <key> [<value>]  设置/更新当前的资源，value不设置是为空值",
 		"del <key>            删除存在的配置",
 		"save [<filename>]    保存当前的资源，空资源必须设置文件名；反正可能覆盖资源文件",
@@ -328,6 +330,30 @@ func (h *iniHelper) cmdGet() {
 	}
 }
 
+// 答应键值的值，以及类型
+func (h *iniHelper) cmdDump() {
+	if h.curKey != "" {
+		xa := h.xa
+		key := xa.Next(xa.Command)
+		if key != "" {
+			rs := h.oIR[h.curKey]
+			ini := rs.ini
+			// 答应类型
+			has, value := ini.Get(key)
+			if has {
+				h.output(fmt.Sprintf("(%T)%v", value, value))
+			} else {
+				h.output("(undefined)undefined")
+			}
+		} else {
+			h.output("命令格式错误",
+				"$ dump <key>")
+		}
+	} else {
+		h.output("当前没有任何资源")
+	}
+}
+
 // 资源值更新
 func (h *iniHelper) cmdSet() {
 	curKey := h.curKey
@@ -341,7 +367,7 @@ func (h *iniHelper) cmdSet() {
 		} else {
 			rs := h.oIR[curKey]
 			ini := rs.ini
-			ini.Set(key, value)
+			ini.Set(key, inigo.ParseValue(value))
 			rs.ini = ini
 			h.oIR[curKey] = rs
 			h.output("设置值成功！")
