@@ -35,6 +35,7 @@ func (a *IniAction) Run() {
 	helper := &iniHelper{}
 	// 初始化
 	helper.oIRQueueManger.init()
+	helper.init()
 	// 输入扫描
 	for input.Scan() {
 		text := input.Text()
@@ -44,7 +45,7 @@ func (a *IniAction) Run() {
 			break
 		}
 		// 助手入口
-		helper.init(text)
+		helper.run(text)
 		// 文本输入前缀
 		fmt.Print("$ ")
 	}
@@ -54,7 +55,7 @@ func (a *IniAction) Run() {
 // ini 文件打开资源
 // 用于缓存数据
 type openIniResource struct {
-	ini      *inigo.Parser
+	ini      inigo.Parser
 	useTime  string // 花费时间
 	name     string // 加载的文件命名
 	alias    string // 别名
@@ -98,6 +99,11 @@ type iniHelper struct {
 	oIRQueueManger
 }
 
+// 项目初始化
+func (h *iniHelper) init() {
+	h.initGlobalResource()
+}
+
 // 全局资源初始化
 func (h *iniHelper) initGlobalResource() {
 	// 首次打开使用是否启用 global
@@ -115,7 +121,7 @@ func (h *iniHelper) initGlobalResource() {
 		})
 
 		newRs := openIniResource{
-			ini:     &ini,
+			ini:     ini,
 			useTime: rtMk(),
 		}
 		vname := gCfg.GetDef("cmd_ini_global_key", vars.CmdIniGlobalKey)
@@ -126,7 +132,7 @@ func (h *iniHelper) initGlobalResource() {
 }
 
 // 初始化
-func (h *iniHelper) init(text string) {
+func (h *iniHelper) run(text string) {
 	// 字符串清洗
 	reg := regexp.MustCompile("[\\s]{2,}")
 	text = reg.ReplaceAllString(text, " ")
@@ -134,7 +140,6 @@ func (h *iniHelper) init(text string) {
 	h.text = text
 	h.cmds = strings.Split(strings.TrimSpace(text), " ")
 
-	h.initGlobalResource()
 	// 命令分发
 	h.router()
 }
@@ -172,6 +177,7 @@ func (h *iniHelper) router() {
 	bin.RegisterFunc("help", h.cmdHelp)   // 获取的帮助信息
 	bin.RegisterFunc("about", h.cmdAbout) // 查询资源信息
 	bin.RegisterFunc("set", h.cmdSet)     // 资源值新增或设置
+	bin.RegisterFunc("del", h.cmdDel)     // 删除存在的键值
 	bin.RegisterFunc("save", h.cmdSave)   // 保存新的资源/或者新文件
 
 	bin.EmptyFunc(h.cmdEmpty)
@@ -213,7 +219,7 @@ func (h *iniHelper) cmdOpen() {
 				// 不存在，则新建
 				oIr := openIniResource{
 					filename: filename,
-					ini:      &ini,
+					ini:      ini,
 					useTime:  rtMk(),
 				}
 				h.oIRQueueManger.oIR[vkey] = oIr
@@ -239,7 +245,7 @@ func (h *iniHelper) cmdNew() {
 		} else {
 			ini := inigo.NewParser()
 			newRs := openIniResource{
-				ini:     &ini,
+				ini:     ini,
 				useTime: rtMk(),
 			}
 			h.oIR[name] = newRs
@@ -286,6 +292,7 @@ func (h *iniHelper) cmdHelp() {
 		"list                 列出全部的可用资源",
 		"get <key>            获取键值",
 		"set <key> [<value>]  设置/更新当前的资源，value不设置是为空值",
+		"del <key>            删除存在的配置",
 		"save [<filename>]    保存当前的资源，空资源必须设置文件名；反正可能覆盖资源文件",
 		"about [<name>]       打印当前的资源写信息",
 		"exit                 退出对话框",
@@ -304,8 +311,7 @@ func (h *iniHelper) cmdGet() {
 
 	if key != "" {
 		if rs, exist := h.oIR[curKey]; exist {
-			ini := *rs.ini
-			fmt.Println(ini.GetData())
+			ini := rs.ini
 			if exist, v := ini.Get(key); exist {
 				h.output(fmt.Sprintf("%v", v))
 			} else {
@@ -333,13 +339,34 @@ func (h *iniHelper) cmdSet() {
 		if key == "" {
 			h.output("参数设置失败，格式有误: $ set <key> [<value>]")
 		} else {
-			//rs := h.oIR[curKey]
-			ini := *h.oIR[curKey].ini
+			rs := h.oIR[curKey]
+			ini := rs.ini
 			ini.Set(key, value)
+			rs.ini = ini
+			h.oIR[curKey] = rs
 			h.output("设置值成功！")
 		}
 	} else {
 		h.output("参数设置失败，当前还没有任何资源！")
+	}
+}
+
+// 删除键值
+func (h *iniHelper) cmdDel() {
+	if h.curKey != "" {
+		xa := h.xa
+		key := xa.Next(xa.Command)
+		if key != "" {
+			if h.oIR[h.curKey].ini.Del(key) {
+				h.output("[" + key + "] 值已被删除！")
+			} else {
+				h.output("[" + key + "] 值不存，删除无效")
+			}
+		} else {
+			h.output("请求参数无效: $ del <key>")
+		}
+	} else {
+		h.output("还未加载/实例任何资源！")
 	}
 }
 
@@ -350,7 +377,7 @@ func (h *iniHelper) cmdSave() {
 		xa := h.xa
 		filename := xa.Next(xa.Command)
 		curRs := h.oIR[curKey]
-		ini := *curRs.ini
+		ini := curRs.ini
 
 		if curRs.filename != "" {
 			// 保存当前文件
