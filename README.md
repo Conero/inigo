@@ -63,7 +63,6 @@ map
 // map[interface{}]interface{}
 m.name = map 数据类型处理
 m.78 = 5555
-
 ```
 
 
