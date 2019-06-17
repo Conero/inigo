@@ -3,6 +3,7 @@ package vars
 import (
 	"fmt"
 	"github.com/conero/inigo"
+	"github.com/conero/uymas"
 )
 
 /**
@@ -29,7 +30,12 @@ func Welcome() {
 		"" +
 			" 欢迎使用 [" + Name + "]" + Br +
 			" version " + Version + "/" + Release + Br +
-			" Since " + Since
+			" Since " + Since + Br +
+			Br +
+			" Base On: " + Br +
+			"   . github/conero/inigo      v" + inigo.Version + "/" + inigo.Release + Br +
+			"   . github/conero/uymas      v" + uymas.Version + "/" + uymas.Release + Br +
+			""
 
 	fmt.Println(welcomeStr)
 }

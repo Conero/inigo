@@ -40,6 +40,7 @@ func (a *IniAction) Run() {
 		text := input.Text()
 		if text == vars.CmdExit {
 			fmt.Println(" 欢迎下次使用 [inigo]， 再见！祝您愉快")
+			fmt.Println()
 			break
 		}
 		// 助手入口
