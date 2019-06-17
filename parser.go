@@ -10,6 +10,9 @@ type Parser interface {
 	Get(key string) (bool, interface{})
 	GetDef(key string, def interface{}) interface{}
 	HasKey(key string) bool
+	// 函数式值获取
+	// 实现如动态值获取，类似 js 对象中的 [get function()]
+	GetFunc(key string, regFn func() interface{}) Parser
 
 	// 支持多级数据访问，获取元素数据
 	// 实际读取的原始数据为 map[string]string

@@ -78,6 +78,12 @@ func (p *BaseParser) Set(key string, value interface{}) Parser {
 	return p
 }
 
+// 函数式值获取
+func (p *BaseParser) GetFunc(key string, regFn func() interface{}) Parser {
+	p.Container.GetFunc(key, regFn)
+	return p
+}
+
 // 判断解析器是否合法
 func (p *BaseParser) IsValid() bool {
 	return p.valid

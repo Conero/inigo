@@ -6,7 +6,8 @@ package inigo
 
 // 抽象参数容器
 type Container struct {
-	Data map[interface{}]interface{}
+	Data        map[interface{}]interface{}
+	_eventGetFn map[interface{}]func() interface{}
 }
 
 // data 数据检测
@@ -22,12 +23,30 @@ func (c *Container) GetData() map[interface{}]interface{} {
 func (c *Container) Get(key interface{}) (bool, interface{}) {
 	data := c.GetData()
 	value, has := data[key]
+	if !has {
+		if c._eventGetFn == nil {
+			c._eventGetFn = map[interface{}]func() interface{}{}
+		}
+		if fn, evtHas := c._eventGetFn[key]; evtHas {
+			value = fn()
+			has = true
+		}
+	}
 	return has, value
 }
 
 // 获取值，且含默认值
 func (c *Container) GetDef(key interface{}, def interface{}) interface{} {
 	return c.Value(key, nil, def)
+}
+
+// get 参数注册
+func (c *Container) GetFunc(key string, fn func() interface{}) *Container {
+	if c._eventGetFn == nil {
+		c._eventGetFn = map[interface{}]func() interface{}{}
+	}
+	c._eventGetFn[key] = fn
+	return c
 }
 
 // 是否存在键值
@@ -42,15 +61,14 @@ func (c *Container) HasKey(key interface{}) bool {
 // Container.Value(key, value interface{})  	设置数据
 // Container.Value(key, nil, def interface{})  	获取值并带参数，可使用新的方法 c.GetDef(key, def interface{})
 func (c *Container) Value(params ...interface{}) interface{} {
-	// key, nil, def
-	if len(params) > 2 {
+	if len(params) > 2 { // key, nil, def
 		if has, value := c.Get(params[0].(string)); has {
 			return value
 		}
 		return params[2]
-	} else if len(params) > 1 {
+	} else if len(params) > 1 { // key, value
 		c.Set(params[0].(string), params[1])
-	} else if len(params) == 1 {
+	} else if len(params) == 1 { // key
 		if has, value := c.Get(params[0].(string)); has {
 			return value
 		}
