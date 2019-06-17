@@ -41,6 +41,7 @@
   - (+) *添加与 Container 对应的 GetDef 方法*
   - (+) *新增方法 `ErrorMsg` 用以返回错误信息*
   - (+) *新增方法 `GetFunc(key string, regFn func() interface{}) Parser` 实现事件驱动式值获取*
+  - (+) *新增方法 `Del` 用于删除配置中的键值*
   - (实现) *实现 `Raw` 方法获取原始的数据，可用于数据测试以及检测*
   - (优化) *调整 `Container` 更改的数据进行优化 (20190606)*
   - (修复) *内部参数 valid 无效的问题*

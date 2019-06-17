@@ -78,6 +78,11 @@ func (p *BaseParser) Set(key string, value interface{}) Parser {
 	return p
 }
 
+// 删除键值
+func (p *BaseParser) Del(key string) bool {
+	return p.Container.Del(key)
+}
+
 // 函数式值获取
 func (p *BaseParser) GetFunc(key string, regFn func() interface{}) Parser {
 	p.Container.GetFunc(key, regFn)

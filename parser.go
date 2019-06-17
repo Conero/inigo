@@ -31,7 +31,8 @@ type Parser interface {
 	// 获取数据返回 nil
 	GetData() map[interface{}]interface{}
 
-	Set(key string, value interface{}) Parser
+	Set(key string, value interface{}) Parser // 设置值
+	Del(key string) bool                      // 删除键值
 
 	// 文件检测有效性
 	IsValid() bool
