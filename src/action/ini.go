@@ -12,6 +12,7 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 )
 
 /**
@@ -52,7 +53,7 @@ func (a *IniAction) Run() {
 // ini 文件打开资源
 // 用于缓存数据
 type openIniResource struct {
-	ini      inigo.Parser
+	ini      *inigo.Parser
 	useTime  string // 花费时间
 	name     string // 加载的文件命名
 	alias    string // 别名
@@ -96,6 +97,33 @@ type iniHelper struct {
 	oIRQueueManger
 }
 
+// 全局资源初始化
+func (h *iniHelper) initGlobalResource() {
+	// 首次打开使用是否启用 global
+	// 以 [$ ini] 命令打开
+	open_use_ini := gCfg.GetDef("cmd_ini_has_global", false)
+	if v, is := open_use_ini.(bool); is && v {
+		rtMk := util.SecCallStr()
+		ini := inigo.NewParser()
+
+		// 特殊变量
+		ini.Set("$cwd", bin.GetApp().Cwd())
+		// 注册遍历
+		ini.GetFunc("$time", func() interface{} {
+			return time.Now().Format("2006-01-02 15:04:05")
+		})
+
+		newRs := openIniResource{
+			ini:     &ini,
+			useTime: rtMk(),
+		}
+		vname := gCfg.GetDef("cmd_ini_global_key", vars.CmdIniGlobalKey)
+		name := vname.(string)
+		h.oIR[name] = newRs
+		h.curKey = name
+	}
+}
+
 // 初始化
 func (h *iniHelper) init(text string) {
 	// 字符串清洗
@@ -105,6 +133,7 @@ func (h *iniHelper) init(text string) {
 	h.text = text
 	h.cmds = strings.Split(strings.TrimSpace(text), " ")
 
+	h.initGlobalResource()
 	// 命令分发
 	h.router()
 }
@@ -183,7 +212,7 @@ func (h *iniHelper) cmdOpen() {
 				// 不存在，则新建
 				oIr := openIniResource{
 					filename: filename,
-					ini:      ini,
+					ini:      &ini,
 					useTime:  rtMk(),
 				}
 				h.oIRQueueManger.oIR[vkey] = oIr
@@ -207,8 +236,9 @@ func (h *iniHelper) cmdNew() {
 		if _, exist := h.oIR[name]; exist {
 			h.output("[" + name + "] 资源已经存在，无法新增对应的资源")
 		} else {
+			ini := inigo.NewParser()
 			newRs := openIniResource{
-				ini:     inigo.NewParser(),
+				ini:     &ini,
 				useTime: rtMk(),
 			}
 			h.oIR[name] = newRs
@@ -272,8 +302,9 @@ func (h *iniHelper) cmdGet() {
 	}
 
 	if key != "" {
-		if rs, exist := h.oIRQueueManger.oIR[curKey]; exist {
-			ini := rs.ini
+		if rs, exist := h.oIR[curKey]; exist {
+			ini := *rs.ini
+			fmt.Println(ini.GetData())
 			if exist, v := ini.Get(key); exist {
 				h.output(fmt.Sprintf("%v", v))
 			} else {
@@ -301,8 +332,9 @@ func (h *iniHelper) cmdSet() {
 		if key == "" {
 			h.output("参数设置失败，格式有误: $ set <key> [<value>]")
 		} else {
-			rs := h.oIR[curKey]
-			rs.ini.Set(key, value)
+			//rs := h.oIR[curKey]
+			ini := *h.oIR[curKey].ini
+			ini.Set(key, value)
 			h.output("设置值成功！")
 		}
 	} else {
@@ -317,16 +349,17 @@ func (h *iniHelper) cmdSave() {
 		xa := h.xa
 		filename := xa.Next(xa.Command)
 		curRs := h.oIR[curKey]
+		ini := *curRs.ini
 
 		if curRs.filename != "" {
 			// 保存当前文件
 			if filename == "" {
-				curRs.ini.Save()
+				ini.Save()
 			} else {
-				curRs.ini.SaveAsFile(filename)
+				ini.SaveAsFile(filename)
 			}
 		} else if filename != "" {
-			curRs.ini.SaveAsFile(filename)
+			ini.SaveAsFile(filename)
 		} else {
 			h.output("保存失败，参数无效！")
 		}

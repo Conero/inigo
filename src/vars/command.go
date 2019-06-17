@@ -7,5 +7,6 @@ package vars
  **/
 
 const (
-	CmdExit = "exit"
+	CmdExit         = "exit"
+	CmdIniGlobalKey = "global" // 全局变量
 )

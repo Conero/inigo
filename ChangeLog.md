@@ -11,6 +11,7 @@
 ### 0.2.0/20190616-alpha
 
 - ini
+  - (+) *首次进入应用时，自动创建 `global` 资源，且可通过配置文件控制*
   - (+) *oIRQueueManger 新增方法 `getCurIni` 和 `getNameList`*
     - (移除) `getCurIni` 方法，重写后台逻辑，简化代码的复杂性
     - (移除) *移除多个冗余的属性值*
