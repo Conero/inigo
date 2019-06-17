@@ -39,7 +39,7 @@ bool
 b1 = true				// 不区分大小写
 b2 = false
 
-int
+int64
 i = 56
 
 float64
@@ -56,6 +56,7 @@ inta = 1, 5, 4, 6, 7, 9
 floata = 7.54, 6.24, 74.24
 stra = tttt, kdjd, ddd
 stra2 = "ffff,fff", 'hhhh', ttt
+stra2 = "ffff,fff", 'hhhh', "ttt"
 
 
 map
