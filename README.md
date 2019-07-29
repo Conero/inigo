@@ -60,6 +60,8 @@ stra2 = "ffff,fff", 'hhhh', "ttt"
 
 
 map
+// 简单二级"."操作，不能大于三年级如: map.c1.c2
+// 该写法与 PHP.ini 配置文件相识，亦可考虑设置开关键
 // map[interface{}]interface{}
 m.name = map 数据类型处理
 m.78 = 5555
