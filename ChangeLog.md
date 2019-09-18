@@ -10,7 +10,8 @@
 
 > todos
 
-- 实现 *[toml](https://github.com/toml-lang/toml)* 基本解析(支持)
+- [ ] 实现 *[toml](https://github.com/toml-lang/toml)* 基本解析(支持)
+- [ ] 代码注释英文化，即便是开始比较困难;以及git commit尽量英文化
 
 
 
