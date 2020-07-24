@@ -2,6 +2,12 @@
 > - @author Joshua Conero
 > - @descrip ini 文件解析器
 
+
+
+**<span style="color: blue">项目以及迁移到：[github.com/conero/uymas/parser/xini](https://github.com/conero/uymas/tree/develop/parser/xini)，该库将不再更新和维护</span>**
+
+
+
 ## 项目管理
 - ``master`` 主分支；用户可下载使用
 - ``alpha`` 开发数据分支(develop)，程序开发不直接操作``master`` 而由开发该分组再合并到主分支
